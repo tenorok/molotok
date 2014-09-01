@@ -5,9 +5,23 @@ module.exports = function(grunt) {
         module = grunt.option('module') || 'main';
 
     grunt.initConfig({
+        mkdir: {
+            release: {
+                options: { create: ['release'] }
+            }
+        },
+        uglify: {
+            release: {
+                options: {
+                    preserveComments: 'some'
+                },
+                files: { 'release/molotok.min.js': 'release/molotok.js' }
+            }
+        },
         clean: {
             test: ['!test/tmp/.gitkeep', 'test/tmp/*'],
-            jsdoc: ['jsdoc']
+            jsdoc: ['jsdoc'],
+            release: ['release']
         },
         shell: {
             jsdoc: { command: './node_modules/.bin/jsdoc -d jsdoc modules/' }
