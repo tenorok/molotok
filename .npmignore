@@ -1,0 +1,6 @@
+.*
+test
+Gruntfile.js
+release/*
+!release/molotok.js
+molotok-*.js
