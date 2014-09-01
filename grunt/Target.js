@@ -14,6 +14,18 @@ Target.definer = function() {
         verbose = ['info', 'error'],
 
         target = {
+            release: {
+                target: 'release/molotok.js',
+                directory: 'modules/',
+                verbose: verbose,
+                jsdoc: {
+                    file: 'Helpers for enjoying the development.',
+                    copyright: '2014 Artem Kurbatov, tenorok.ru',
+                    license: 'MIT license',
+                    version: 'package.json',
+                    date: true
+                }
+            },
             main: {
                 target: 'test/tmp/main.js',
                 directory: directories,
