@@ -1,7 +1,7 @@
 {
     "name": "molotok",
     "description": "Helpers for enjoying the development.",
-    "version": "0.0.0",
+    "version": "0.1.0-alpha.1",
     "license": "MIT",
     "ignore": [
         "**/.*",
