@@ -2,14 +2,41 @@
  * @file Helpers for enjoying the development.
  * @copyright 2014 Artem Kurbatov, tenorok.ru
  * @license MIT license
- * @version 0.1.0-alpha.1
+ * @version 0.1.0-alpha.2
  * @date 2 September 2014
  */
 (function(global, undefined) {
 var definer = {
 export: function(key, value) { return typeof exports === "object" ? module.exports[key] = value : global[key] = value; }
 };
-var is = (function () {
+var functions = (function () {
+
+    /**
+     * Модуль работы с функциями.
+     *
+     * @class
+     */
+    function functions() {}
+
+    /**
+     * Создать экземпляр класса с помощью apply.
+     *
+     * @param {Function} constructor Класс
+     * @param {array} args Массив аргументов
+     * @returns {Object} Экземпляр класса
+     */
+    functions.apply = function(constructor, args) {
+        function F() {
+            return constructor.apply(this, args);
+        }
+        F.prototype = constructor.prototype;
+        return new F();
+    };
+
+    return functions;
+
+}).call(global),
+is = (function () {
 
     /**
      * Модуль работы с типами данных.
@@ -352,134 +379,6 @@ var is = (function () {
     return is;
 
 }).call(global),
-number = (function (is) {
-
-    /**
-     * Модуль работы с числами.
-     *
-     * @class
-     */
-    function number() {}
-
-    /**
-     * Получить случайное число.
-     *
-     * При вызове без аргументов возвращает
-     * случайное дробное число от 0 до 1.
-     *
-     * При вызове с указанием минимума и максимума
-     * возвращает дробное число из этого промежутка.
-     *
-     * При вызове со всеми тремя аргументами возвращает
-     * дробное число из заданного промежутка,
-     * делящееся без остатка на указанный шаг.
-     *
-     * @param {number} [min] Минимум
-     * @param {number} [max] Максимум
-     * @param {number} [step] Шаг
-     * @returns {number}
-     */
-    number.random = function(min, max, step) {
-
-        if(is.undefined(min) && is.undefined(max)) {
-            return Math.random();
-        }
-
-        if(is.undefined(step)) {
-            return Math.random() * (max - min) + min;
-        }
-
-        return (Math.floor(Math.random() * (max - min) / step) * step) + min;
-    };
-
-    return number;
-
-}).call(global, is),
-object = (function (is) {
-
-    /**
-     * Модуль работы с объектами.
-     *
-     * @class
-     */
-    function object() {}
-
-    /**
-     * Расширить объект.
-     *
-     * @param {object} object Расширяемый объект
-     * @param {...object} source Расширяющие объекты
-     * @returns {object}
-     */
-    object.extend = function(object, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                extended[key] = source[key];
-                return extended;
-            }, object);
-        }, object);
-    };
-
-    /**
-     * Расширить объект рекурсивно.
-     *
-     * @param {object} obj Расширяемый объект
-     * @param {...object} source Расширяющие объекты
-     * @returns {object}
-     */
-    object.deepExtend = function(obj, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                var extendedItem = extended[key],
-                    sourceItem = source[key],
-                    isMapSourceItem = is.map(sourceItem);
-
-                if(is.map(extendedItem) && isMapSourceItem) {
-                    extended[key] = this.deepExtend(extendedItem, sourceItem);
-                } else if(isMapSourceItem) {
-                    extended[key] = object.clone(sourceItem);
-                } else {
-                    extended[key] = sourceItem;
-                }
-
-                return extended;
-            }.bind(this), obj);
-        }.bind(this), object);
-    };
-
-    /**
-     * Проверить объект на наличие полей.
-     *
-     * @param {object} object Объект
-     * @returns {boolean}
-     */
-    object.isEmpty = function(object) {
-        return !Object.keys(object || {}).length;
-    };
-
-    /**
-     * Клонировать объект.
-     *
-     * @param {object} obj Объект
-     * @returns {object}
-     */
-    object.clone = function(obj) {
-        return object.extend({}, obj);
-    };
-
-    /**
-     * Клонировать объект рекурсивно.
-     *
-     * @param {object} obj Объект
-     * @returns {object}
-     */
-    object.deepClone = function(obj) {
-        return object.deepExtend({}, obj);
-    };
-
-    return object;
-
-}).call(global, is),
 string = (function (is) {
 
     /**
@@ -629,33 +528,134 @@ string = (function (is) {
     return string;
 
 }).call(global, is),
-functions = (function () {
+number = (function (is) {
 
     /**
-     * Модуль работы с функциями.
+     * Модуль работы с числами.
      *
      * @class
      */
-    function functions() {}
+    function number() {}
 
     /**
-     * Создать экземпляр класса с помощью apply.
+     * Получить случайное число.
      *
-     * @param {Function} constructor Класс
-     * @param {array} args Массив аргументов
-     * @returns {Object} Экземпляр класса
+     * При вызове без аргументов возвращает
+     * случайное дробное число от 0 до 1.
+     *
+     * При вызове с указанием минимума и максимума
+     * возвращает дробное число из этого промежутка.
+     *
+     * При вызове со всеми тремя аргументами возвращает
+     * дробное число из заданного промежутка,
+     * делящееся без остатка на указанный шаг.
+     *
+     * @param {number} [min] Минимум
+     * @param {number} [max] Максимум
+     * @param {number} [step] Шаг
+     * @returns {number}
      */
-    functions.apply = function(constructor, args) {
-        function F() {
-            return constructor.apply(this, args);
+    number.random = function(min, max, step) {
+
+        if(is.undefined(min) && is.undefined(max)) {
+            return Math.random();
         }
-        F.prototype = constructor.prototype;
-        return new F();
+
+        if(is.undefined(step)) {
+            return Math.random() * (max - min) + min;
+        }
+
+        return (Math.floor(Math.random() * (max - min) / step) * step) + min;
     };
 
-    return functions;
+    return number;
 
-}).call(global),
+}).call(global, is),
+object = (function (is) {
+
+    /**
+     * Модуль работы с объектами.
+     *
+     * @class
+     */
+    function object() {}
+
+    /**
+     * Расширить объект.
+     *
+     * @param {object} object Расширяемый объект
+     * @param {...object} source Расширяющие объекты
+     * @returns {object}
+     */
+    object.extend = function(object, source) {
+        return [].slice.call(arguments, 1).reduce(function(object, source) {
+            return Object.keys(source).reduce(function(extended, key) {
+                extended[key] = source[key];
+                return extended;
+            }, object);
+        }, object);
+    };
+
+    /**
+     * Расширить объект рекурсивно.
+     *
+     * @param {object} obj Расширяемый объект
+     * @param {...object} source Расширяющие объекты
+     * @returns {object}
+     */
+    object.deepExtend = function(obj, source) {
+        return [].slice.call(arguments, 1).reduce(function(object, source) {
+            return Object.keys(source).reduce(function(extended, key) {
+                var extendedItem = extended[key],
+                    sourceItem = source[key],
+                    isMapSourceItem = is.map(sourceItem);
+
+                if(is.map(extendedItem) && isMapSourceItem) {
+                    extended[key] = this.deepExtend(extendedItem, sourceItem);
+                } else if(isMapSourceItem) {
+                    extended[key] = object.clone(sourceItem);
+                } else {
+                    extended[key] = sourceItem;
+                }
+
+                return extended;
+            }.bind(this), obj);
+        }.bind(this), object);
+    };
+
+    /**
+     * Проверить объект на наличие полей.
+     *
+     * @param {object} object Объект
+     * @returns {boolean}
+     */
+    object.isEmpty = function(object) {
+        return !Object.keys(object || {}).length;
+    };
+
+    /**
+     * Клонировать объект.
+     *
+     * @param {object} obj Объект
+     * @returns {object}
+     */
+    object.clone = function(obj) {
+        return object.extend({}, obj);
+    };
+
+    /**
+     * Клонировать объект рекурсивно.
+     *
+     * @param {object} obj Объект
+     * @returns {object}
+     */
+    object.deepClone = function(obj) {
+        return object.deepExtend({}, obj);
+    };
+
+    return object;
+
+}).call(global, is),
 molotok = definer.export("molotok", (function (
         is, string, number, object, functions
     ) {
