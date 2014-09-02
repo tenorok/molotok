@@ -5,7 +5,8 @@ module.exports = function(grunt) {
         module = grunt.option('module') || 'main',
 
         Release = require('./grunt/Release'),
-        release = new Release(grunt.option('ver'));
+        release = new Release(grunt.option('ver')),
+        currentPackageVersion = release.getPackageVersion();
 
     grunt.initConfig({
         mkdir: {
@@ -36,6 +37,18 @@ module.exports = function(grunt) {
                     'mv ../molotok-tmp-jsdoc jsdoc',
                     'git add jsdoc',
                     'git commit -m "Update JSDoc"',
+                    'git push origin gh-pages',
+                    'git checkout dev'
+                ].join(' && ')
+            },
+            updaterelease: {
+                command: [
+                    'cp -r release ../molotok-tmp-release',
+                    'git checkout gh-pages',
+                    'rm -rf release',
+                    'mv ../molotok-tmp-release release',
+                    'git add release',
+                    'git commit -m "Update release ' + currentPackageVersion + '"',
                     'git push origin gh-pages',
                     'git checkout dev'
                 ].join(' && ')
@@ -78,6 +91,14 @@ module.exports = function(grunt) {
     grunt.registerTask('update:jsdoc', [
         'jsdoc',
         'shell:updatejsdoc'
+    ]);
+
+    grunt.registerTask('update:release', [
+        'clean:release',
+        'mkdir:release',
+        'definer:release',
+        'uglify:release',
+        'shell:updaterelease'
     ]);
 
     grunt.registerTask('release', function() {

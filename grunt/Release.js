@@ -52,6 +52,15 @@ Release.prototype = {
             json.version = this.version;
             fs.writeFileSync(file, JSON.stringify(json, undefined, '    ') + '\n');
         }, this);
+    },
+
+    /**
+     * Получить поле `version` из package.json
+     *
+     * @returns {string}
+     */
+    getPackageVersion: function() {
+        return JSON.parse(fs.readFileSync('package.json', { encoding: 'utf8' })).version;
     }
 
 };
