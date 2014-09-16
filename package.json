@@ -1,7 +1,7 @@
 {
     "name": "molotok",
     "description": "Helpers for enjoying the development.",
-    "version": "0.1.0-alpha.2",
+    "version": "0.1.0-alpha.3",
     "repository": {
         "type": "git",
         "url": "https://github.com/tenorok/molotok.git"
@@ -26,6 +26,8 @@
         "grunt-shell": "~0.7.0",
         "grunt-contrib-clean": "~0.5.0",
         "grunt-mkdir": "~0.1.1",
-        "grunt-contrib-uglify": "~0.4.0"
+        "grunt-contrib-uglify": "~0.4.0",
+        "benchmark": "~1.0.0",
+        "beautify-benchmark": "~0.2.4"
     }
 }

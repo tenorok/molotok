@@ -35,7 +35,7 @@ module.exports = function(grunt) {
                     'git checkout gh-pages',
                     'rm -rf jsdoc',
                     'mv ../molotok-tmp-jsdoc jsdoc',
-                    'git add jsdoc',
+                    'git add --all jsdoc',
                     'git commit -m "Update JSDoc"',
                     'git push origin gh-pages',
                     'git checkout dev'
@@ -85,6 +85,12 @@ module.exports = function(grunt) {
     grunt.registerTask('test', [
         'clean:test',
         'definer:' + module,
+        'mochaTest'
+    ]);
+
+    grunt.registerTask('benchmark', [
+        'clean:test',
+        'definer:' + module + 'Benchmark',
         'mochaTest'
     ]);
 
