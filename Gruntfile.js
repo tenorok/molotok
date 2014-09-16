@@ -88,6 +88,12 @@ module.exports = function(grunt) {
         'mochaTest'
     ]);
 
+    grunt.registerTask('benchmark', [
+        'clean:test',
+        'definer:' + module + 'Benchmark',
+        'mochaTest'
+    ]);
+
     grunt.registerTask('update:jsdoc', [
         'jsdoc',
         'shell:updatejsdoc'

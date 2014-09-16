@@ -307,9 +307,12 @@ definer('is', /** @exports is */ function() {
      * @returns {boolean}
      */
     is._every = function(args, callback) {
-        return Object.keys(args).every(function(arg) {
-            return callback.call(args[arg], args[arg]);
-        });
+        for(var arg in args) if(args.hasOwnProperty(arg)) {
+            if(!callback.call(args[arg], args[arg])) {
+                return false;
+            }
+        }
+        return true;
     };
 
     /**

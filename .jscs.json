@@ -4,7 +4,6 @@
     ],
     "requireCurlyBraces": [
         "else",
-        "for",
         "while",
         "do",
         "try",
