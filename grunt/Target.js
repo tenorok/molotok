@@ -15,6 +15,7 @@ Target.definer = function() {
         ],
 
         directories = ['modules/', 'test/'],
+        directoriesBenchmark = ['modules/', 'test/helpers/', 'benchmark/'],
         verbose = ['info', 'error'],
 
         target = {
@@ -31,8 +32,13 @@ Target.definer = function() {
                 }
             },
             main: {
-                target: 'test/tmp/main.js',
+                target: 'test/tmp/mainTest.js',
                 directory: directories,
+                verbose: verbose
+            },
+            mainBenchmark: {
+                target: 'test/tmp/mainBenchmark.js',
+                directory: directoriesBenchmark,
                 verbose: verbose
             }
         };
@@ -52,7 +58,7 @@ Target.definer = function() {
         target[benchmarkName] = {
             module: benchmarkName,
             target: 'test/tmp/' + benchmarkName + '.js',
-            directory: ['modules/', 'test/helpers/', 'benchmark/'],
+            directory: directoriesBenchmark,
             verbose: verbose
         };
     });
