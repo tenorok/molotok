@@ -10,6 +10,10 @@ Target.definer = function() {
             'functions'
         ],
 
+        benchmarkModules = [
+            'is'
+        ],
+
         directories = ['modules/', 'test/'],
         verbose = ['info', 'error'],
 
@@ -39,6 +43,16 @@ Target.definer = function() {
             module: testName,
             target: 'test/tmp/' + testName + '.js',
             directory: directories,
+            verbose: verbose
+        };
+    });
+
+    benchmarkModules.forEach(function(moduleName) {
+        var benchmarkName = moduleName + 'Benchmark';
+        target[benchmarkName] = {
+            module: benchmarkName,
+            target: 'test/tmp/' + benchmarkName + '.js',
+            directory: ['modules/', 'test/helpers/', 'benchmark/'],
             verbose: verbose
         };
     });
