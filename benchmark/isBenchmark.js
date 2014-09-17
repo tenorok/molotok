@@ -43,7 +43,7 @@ definer('isBenchmark', function(format, is) {
         ops.integerThree = 250000;
         it('Проверка на целое число: три аргумента / ' + format(ops.integerThree), function(done) {
             new Benchmark.Suite()
-                .add('integer', function() {
+                .add('integer: 3', function() {
                     is.integer(25, 37, 90);
                 })
                 .on('cycle', function(event) { benchmarks.add(event.target); })
@@ -60,7 +60,7 @@ definer('isBenchmark', function(format, is) {
         ops.integerOne = 500000;
         it('Проверка на целое число: один аргумент / ' + format(ops.integerOne), function(done) {
             new Benchmark.Suite()
-                .add('integer', function() {
+                .add('integer: 1', function() {
                     is.integer(25.5);
                 })
                 .on('cycle', function(event) { benchmarks.add(event.target); })
