@@ -17,10 +17,10 @@ definer('object', /** @exports object */ function(is) {
     object.extend = function(object, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
             var sourceObj = arguments[s],
-                sourceKeys = Object.keys(sourceObj);
-            for(var i = 0, len = sourceKeys.length; i < len; i++) {
-                var sourceKey = sourceKeys[i];
-                object[sourceKey] = sourceObj[sourceKey];
+                keys = Object.keys(sourceObj);
+            for(var i = 0, len = keys.length; i < len; i++) {
+                var key = keys[i];
+                object[key] = sourceObj[key];
             }
         }
         return object;
@@ -34,23 +34,26 @@ definer('object', /** @exports object */ function(is) {
      * @returns {object}
      */
     object.deepExtend = function(obj, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                var extendedItem = extended[key],
-                    sourceItem = source[key],
-                    isMapSourceItem = is.map(sourceItem);
+        for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            var sourceObj = arguments[s],
+                keys = Object.keys(sourceObj);
 
-                if(is.map(extendedItem) && isMapSourceItem) {
-                    extended[key] = this.deepExtend(extendedItem, sourceItem);
+            for(var i = 0, len = keys.length; i < len; i++) {
+                var key = keys[i],
+                    objVal = obj[key],
+                    sourceVal = sourceObj[key],
+                    isMapSourceItem = is.map(sourceVal);
+
+                if(is.map(objVal) && isMapSourceItem) {
+                    obj[key] = this.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
-                    extended[key] = object.clone(sourceItem);
+                    obj[key] = object.clone(sourceVal);
                 } else {
-                    extended[key] = sourceItem;
+                    obj[key] = sourceVal;
                 }
-
-                return extended;
-            }.bind(this), obj);
-        }.bind(this), object);
+            }
+        }
+        return obj;
     };
 
     /**
