@@ -216,8 +216,9 @@ definer('is', /** @exports is */ function() {
                 }
             }
 
-            var last;
-            for(var i in this) { last = i; }
+            var keys = Object.keys(this),
+                last = keys[keys.length - 1];
+
             return is.undefined(last) || this.hasOwnProperty(last);
         });
     };
@@ -307,8 +308,9 @@ definer('is', /** @exports is */ function() {
      * @returns {boolean}
      */
     is._every = function(args, callback) {
-        for(var arg in args) if(args.hasOwnProperty(arg)) {
-            if(!callback.call(args[arg], args[arg])) {
+        for(var i = 0, len = args.length; i < len; i++) {
+            var a = args[i];
+            if(!callback.call(a, a)) {
                 return false;
             }
         }
