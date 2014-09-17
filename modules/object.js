@@ -15,12 +15,15 @@ definer('object', /** @exports object */ function(is) {
      * @returns {object}
      */
     object.extend = function(object, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                extended[key] = source[key];
-                return extended;
-            }, object);
-        }, object);
+        for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            var sourceObj = arguments[s],
+                sourceKeys = Object.keys(sourceObj);
+            for(var i = 0, len = sourceKeys.length; i < len; i++) {
+                var sourceKey = sourceKeys[i];
+                object[sourceKey] = sourceObj[sourceKey];
+            }
+        }
+        return object;
     };
 
     /**

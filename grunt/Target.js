@@ -11,7 +11,8 @@ Target.definer = function() {
         ],
 
         benchmarkModules = [
-            'is'
+            'is',
+            'object'
         ],
 
         directories = ['modules/', 'test/'],
