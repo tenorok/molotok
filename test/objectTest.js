@@ -10,6 +10,12 @@ definer('objectTest', function(assert, object) {
             assert.deepEqual(object.extend({ a: 1 }, { b: 2 }, { a: 3 }), { a: 3, b: 2 });
         });
 
+        it('Расширить только собственные свойства объекта', function() {
+            Object.prototype.z = 100;
+            assert.equal(JSON.stringify(object.extend({ a: 1 }, { b: 2 })), JSON.stringify({ a: 1, b: 2 }));
+            Object.prototype = {};
+        });
+
         it('Расширить объект рекурсивно', function() {
             assert.deepEqual(object.deepExtend(
                 {

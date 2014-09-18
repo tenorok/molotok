@@ -6,7 +6,7 @@ definer('objectBenchmark', function(format, object) {
         var ops = {};
         this.timeout(15000);
 
-        ops.extend = 900000;
+        ops.extend = 1400000;
         it('Проверка расширения объекта / ' + format(ops.extend), function(done) {
             new Benchmark.Suite()
                 .add('extend', function() {

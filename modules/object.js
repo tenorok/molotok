@@ -16,11 +16,19 @@ definer('object', /** @exports object */ function(is) {
      */
     object.extend = function(object, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
-            var sourceObj = arguments[s],
-                keys = Object.keys(sourceObj);
-            for(var i = 0, len = keys.length; i < len; i++) {
-                var key = keys[i];
-                object[key] = sourceObj[key];
+
+            var needHasOwnProperty = false, p;
+            for(p in {}) { needHasOwnProperty = true; break; }
+
+            var sourceObj = arguments[s];
+            for(p in sourceObj) {
+                if(needHasOwnProperty) {
+                    if(sourceObj.hasOwnProperty(p)) {
+                        object[p] = sourceObj[p];
+                    }
+                } else {
+                    object[p] = sourceObj[p];
+                }
             }
         }
         return object;
