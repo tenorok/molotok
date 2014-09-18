@@ -257,20 +257,19 @@ definer('is', /** @exports is */ function() {
      * @returns {string}
      */
     is.type = function(subject) {
-        var args = arguments,
-            firstType;
+        var firstType,
+            types = ['string', 'number', 'nan', 'boolean', 'null', 'undefined', 'array',
+                'argument', 'native', 'function', 'map', 'date', 'regexp'];
 
-        ['string', 'number', 'nan', 'boolean', 'null', 'undefined', 'array',
-         'argument', 'native', 'function', 'map', 'date', 'regexp'].some(function(type) {
-            if(is[type](args[0])) {
+        for(var i = 0, len = types.length; i < len; i++) {
+            var type = types[i];
+            if(is[type](arguments[0])) {
                 firstType = type;
-                return true;
-            } else {
-                return false;
+                break;
             }
-        });
+        }
 
-        return is._every(args, function(that) {
+        return is._every(arguments, function(that) {
             return is[firstType](that);
         }) ? firstType : 'mixed';
     };

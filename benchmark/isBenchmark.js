@@ -74,5 +74,22 @@ definer('isBenchmark', function(format, is) {
                 .run({ async: true });
         });
 
+        ops.type = 200000;
+        it('Получение типа данных / ' + format(ops.type), function(done) {
+            new Benchmark.Suite()
+                .add('type', function() {
+                    is.type(true, false, 100);
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+
+                    result.target.hz < ops.type
+                        ? done(new Error('Slower than ' + format(ops.type)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
     });
 });

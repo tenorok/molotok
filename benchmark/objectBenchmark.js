@@ -26,7 +26,7 @@ definer('objectBenchmark', function(format, object) {
         ops.deepExtend = 54000;
         it('Рекурсивное расширение объекта / ' + format(ops.deepExtend), function(done) {
             new Benchmark.Suite()
-                .add('extend', function() {
+                .add('deepExtend', function() {
                     object.deepExtend({ a: 1, b: { c: 2 }}, { c: 3, b: { d: 4 }}, { b: { c: 5 }});
                 })
                 .on('cycle', function(event) { benchmarks.add(event.target); })
@@ -43,7 +43,7 @@ definer('objectBenchmark', function(format, object) {
         ops.isEmpty = 6000000;
         it('Проверка объекта на наличие полей / ' + format(ops.isEmpty), function(done) {
             new Benchmark.Suite()
-                .add('extend', function() {
+                .add('isEmpty', function() {
                     object.isEmpty({});
                     object.isEmpty({ a: 1 });
                 })
