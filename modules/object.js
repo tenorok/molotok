@@ -8,56 +8,82 @@ definer('object', /** @exports object */ function(is) {
     function object() {}
 
     /**
+     * Проверить необходимость использования hasOwnProperty
+     * при переборе свойств объекта.
+     *
+     * @param {object} original Объект для перебора
+     * @returns {boolean}
+     */
+    object.isNeedHasOwnProperty = function(original) {
+        for(key in {}) return true;
+        for(var key in Object.getPrototypeOf(original)) return true;
+        return false;
+    };
+
+    /**
      * Расширить объект.
      *
-     * @param {object} object Расширяемый объект
+     * @param {object} original Расширяемый объект
      * @param {...object} source Расширяющие объекты
      * @returns {object}
      */
-    object.extend = function(object, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                extended[key] = source[key];
-                return extended;
-            }, object);
-        }, object);
+    object.extend = function(original, source) {
+        for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            var sourceObj = arguments[s],
+                needHasOwnProperty = object.isNeedHasOwnProperty(sourceObj);
+            for(var key in sourceObj) {
+                if(needHasOwnProperty && !sourceObj.hasOwnProperty(key)) continue;
+                original[key] = sourceObj[key];
+            }
+        }
+        return original;
     };
 
     /**
      * Расширить объект рекурсивно.
      *
-     * @param {object} obj Расширяемый объект
+     * @param {object} original Расширяемый объект
      * @param {...object} source Расширяющие объекты
      * @returns {object}
      */
-    object.deepExtend = function(obj, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                var extendedItem = extended[key],
-                    sourceItem = source[key],
-                    isMapSourceItem = is.map(sourceItem);
+    object.deepExtend = function(original, source) {
+        for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            var sourceObj = arguments[s],
+                needHasOwnProperty = object.isNeedHasOwnProperty(sourceObj);
 
-                if(is.map(extendedItem) && isMapSourceItem) {
-                    extended[key] = this.deepExtend(extendedItem, sourceItem);
+            for(var key in sourceObj) {
+                if(needHasOwnProperty && !sourceObj.hasOwnProperty(key)) continue;
+
+                var objVal = original[key],
+                    sourceVal = sourceObj[key],
+                    isMapSourceItem = is.map(sourceVal);
+
+                if(is.map(objVal) && isMapSourceItem) {
+                    original[key] = this.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
-                    extended[key] = object.clone(sourceItem);
+                    original[key] = object.clone(sourceVal);
                 } else {
-                    extended[key] = sourceItem;
+                    original[key] = sourceVal;
                 }
-
-                return extended;
-            }.bind(this), obj);
-        }.bind(this), object);
+            }
+        }
+        return original;
     };
 
     /**
      * Проверить объект на наличие полей.
      *
-     * @param {object} object Объект
+     * @param {object} original Объект
      * @returns {boolean}
      */
-    object.isEmpty = function(object) {
-        return !Object.keys(object || {}).length;
+    object.isEmpty = function(original) {
+        original = original || {};
+        var needHasOwnProperty = object.isNeedHasOwnProperty(original);
+        for(var key in original) {
+            if(needHasOwnProperty && !original.hasOwnProperty(key)) continue;
+            return false;
+        }
+        return true;
     };
 
     /**
