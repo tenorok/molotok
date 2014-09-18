@@ -10,12 +10,6 @@ definer('objectTest', function(assert, object) {
             assert.deepEqual(object.extend({ a: 1 }, { b: 2 }, { a: 3 }), { a: 3, b: 2 });
         });
 
-        it('Расширить только собственные свойства объекта', function() {
-            Object.prototype.z = 100;
-            assert.equal(JSON.stringify(object.extend({ a: 1 }, { b: 2 })), JSON.stringify({ a: 1, b: 2 }));
-            Object.prototype = {};
-        });
-
         it('Расширить объект рекурсивно', function() {
             assert.deepEqual(object.deepExtend(
                 {
@@ -111,7 +105,13 @@ definer('objectTest', function(assert, object) {
             );
         });
 
-        it('Расширить объект только собственными свойствами', function() {
+        it('Перебрать для расширения только собственные свойства объекта', function() {
+            Object.prototype.z = 100;
+            assert.equal(JSON.stringify(object.extend({ a: 1 }, { b: 2 })), JSON.stringify({ a: 1, b: 2 }));
+            delete Object.prototype.z;
+        });
+
+        it('Расширить объект только собственными свойствами экземпляра функции', function() {
             function Foo() {
                 this.a = 1;
                 this.c = 3;
@@ -152,6 +152,19 @@ definer('objectTest', function(assert, object) {
 
             d.b.c = 200;
             assert.equal(a.b.c, 100);
+        });
+
+        it('Проверить необходимость использования hasOwnProperty', function() {
+            assert.isFalse(object.isNeedHasOwnProperty({}));
+
+            function Foo() {}
+            assert.isFalse(object.isNeedHasOwnProperty(new Foo));
+            Foo.prototype.a = 1;
+            assert.isTrue(object.isNeedHasOwnProperty(new Foo));
+
+            Object.prototype.z = 100;
+            assert.isTrue(object.isNeedHasOwnProperty({}));
+            delete Object.prototype.z;
         });
 
     });
