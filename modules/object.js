@@ -16,19 +16,16 @@ definer('object', /** @exports object */ function(is) {
      */
     object.extend = function(object, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            var sourceObj = arguments[s],
+                needHasOwnProperty = false,
+                key;
 
-            var needHasOwnProperty = false, p;
-            for(p in {}) { needHasOwnProperty = true; break; }
-
-            var sourceObj = arguments[s];
-            for(p in sourceObj) {
-                if(needHasOwnProperty) {
-                    if(sourceObj.hasOwnProperty(p)) {
-                        object[p] = sourceObj[p];
-                    }
-                } else {
-                    object[p] = sourceObj[p];
+            for(key in {}) { needHasOwnProperty = true; break; }
+            for(key in sourceObj) {
+                if(needHasOwnProperty && !sourceObj.hasOwnProperty(key)) {
+                    continue;
                 }
+                object[key] = sourceObj[key];
             }
         }
         return object;
@@ -44,11 +41,16 @@ definer('object', /** @exports object */ function(is) {
     object.deepExtend = function(obj, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
             var sourceObj = arguments[s],
-                keys = Object.keys(sourceObj);
+                needHasOwnProperty = false,
+                key;
 
-            for(var i = 0, len = keys.length; i < len; i++) {
-                var key = keys[i],
-                    objVal = obj[key],
+            for(key in {}) { needHasOwnProperty = true; break; }
+            for(key in sourceObj) {
+                if(needHasOwnProperty && !sourceObj.hasOwnProperty(key)) {
+                    continue;
+                }
+
+                var objVal = obj[key],
                     sourceVal = sourceObj[key],
                     isMapSourceItem = is.map(sourceVal);
 
