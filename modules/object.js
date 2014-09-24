@@ -30,10 +30,12 @@ definer('object', /** @exports object */ function(is) {
     object.extend = function(original, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
             var sourceObj = arguments[s],
-                needHasOwnProperty = object.isNeedHasOwnProperty(sourceObj);
-            for(var key in sourceObj) {
-                if(needHasOwnProperty && !sourceObj.hasOwnProperty(key)) continue;
-                original[key] = sourceObj[key];
+                key;
+
+            if(object.isNeedHasOwnProperty(sourceObj)) {
+                for(key in sourceObj) if(object.hasOwnProperty(sourceObj, key)) original[key] = sourceObj[key];
+            } else {
+                for(key in sourceObj) original[key] = sourceObj[key];
             }
         }
         return original;
@@ -48,14 +50,8 @@ definer('object', /** @exports object */ function(is) {
      */
     object.deepExtend = function(original, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
-            var sourceObj = arguments[s],
-                needHasOwnProperty = object.isNeedHasOwnProperty(sourceObj);
-
-            for(var key in sourceObj) {
-                if(needHasOwnProperty && !sourceObj.hasOwnProperty(key)) continue;
-
+            object.each(arguments[s], function(key, sourceVal) {
                 var objVal = original[key],
-                    sourceVal = sourceObj[key],
                     isMapSourceItem = is.map(sourceVal);
 
                 if(is.map(objVal) && isMapSourceItem) {
@@ -65,7 +61,7 @@ definer('object', /** @exports object */ function(is) {
                 } else {
                     original[key] = sourceVal;
                 }
-            }
+            });
         }
         return original;
     };
