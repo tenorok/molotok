@@ -205,5 +205,14 @@ definer('objectTest', function(assert, object) {
             }, context);
         });
 
+        it('Проитерироваться по объекту и прервать перебор', function() {
+            var vals = [];
+            object.each({ a: 1, b: 2, c: 3, d: 4 }, function(key, val) {
+                if(val === 3) return false;
+                vals.push(val);
+            }, context);
+            assert.deepEqual(vals, [1, 2]);
+        });
+
     });
 });

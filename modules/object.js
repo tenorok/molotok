@@ -125,6 +125,8 @@ definer('object', /** @exports object */ function(is) {
      * @callback object~eachCallback
      * @param {string} key Ключ
      * @param {*} val Значение
+     * @returns {undefined|*} При возвращении любого значения, кроме `undefined`,
+     * перебор останавливается и метод `each` возвращает это значение
      */
 
     /**
@@ -133,17 +135,21 @@ definer('object', /** @exports object */ function(is) {
      * @param {object} obj Объект
      * @param {object~eachCallback} callback Колбек
      * @param {object} [context] Контекст вызова колбека
+     * @returns {*}
      */
     object.each = function(obj, callback, context) {
-        var key;
+        var key,
+            result;
 
         if(object.isNeedHasOwnProperty(obj)) {
             for(key in obj) if(object.hasOwnProperty(obj, key)) {
-                callback.call(context || this, key, obj[key]);
+                result = callback.call(context || this, key, obj[key]);
+                if(result !== undefined) return result;
             }
         } else {
             for(key in obj) {
-                callback.call(context || this, key, obj[key]);
+                result = callback.call(context || this, key, obj[key]);
+                if(result !== undefined) return result;
             }
         }
     };
