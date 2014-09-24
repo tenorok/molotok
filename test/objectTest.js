@@ -167,5 +167,43 @@ definer('objectTest', function(assert, object) {
             delete Object.prototype.z;
         });
 
+        it('Проитерироваться по объекту', function() {
+            var items = [];
+            object.each({ a: 'first', b: 100, c: true, d: null }, function(key, val) {
+                items.push({ key: key, val: val });
+            });
+            assert.deepEqual(items, [
+                { key: 'a', val: 'first' },
+                { key: 'b', val: 100 },
+                { key: 'c', val: true },
+                { key: 'd', val: null }
+            ]);
+        });
+
+        it('Проитерироваться по объекту с прототипом', function() {
+
+            function Foo() {
+                this.a = 20;
+                this.b = true;
+            }
+            Foo.prototype = { hasOwnProperty: null, p: 500 };
+
+            var items = [];
+            object.each(new Foo(), function(key, val) {
+                items.push({ key: key, val: val });
+            });
+            assert.deepEqual(items, [
+                { key: 'a', val: 20 },
+                { key: 'b', val: true }
+            ]);
+        });
+
+        it('Проитерироваться по объекту с указанием контекста', function() {
+            var context = {};
+            object.each({ a: 1 }, function() {
+                assert.deepEqual(this, context);
+            }, context);
+        });
+
     });
 });

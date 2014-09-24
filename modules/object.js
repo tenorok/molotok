@@ -106,6 +106,43 @@ definer('object', /** @exports object */ function(is) {
         return object.deepExtend({}, obj);
     };
 
+    /**
+     * Закешированный метод hasOwnProperty.
+     *
+     * @type {function}
+     */
+    object.hasOwnProperty = Object.prototype.hasOwnProperty;
+
+    /**
+     * Колбек вызывается для каждого ключа объекта
+     * при переборе методом `each`.
+     *
+     * @callback object~eachCallback
+     * @param {string} key Ключ
+     * @param {*} val Значение
+     */
+
+    /**
+     * Проитерироваться по ключам объекта.
+     *
+     * @param {object} obj Объект
+     * @param {object~eachCallback} callback Колбек
+     * @param {object} [context] Контекст вызова колбека
+     */
+    object.each = function(obj, callback, context) {
+        var key;
+
+        if(object.isNeedHasOwnProperty(obj)) {
+            for(key in obj) if(object.hasOwnProperty.call(obj, key)) {
+                callback.call(context || this, key, obj[key]);
+            }
+        } else {
+            for(key in obj) {
+                callback.call(context || this, key, obj[key]);
+            }
+        }
+    };
+
     return object;
 
 });
