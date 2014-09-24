@@ -107,11 +107,16 @@ definer('object', /** @exports object */ function(is) {
     };
 
     /**
-     * Закешированный метод hasOwnProperty.
+     * Проверить принадлежность свойства
+     * объекту с помощью hasOwnProperty.
      *
-     * @type {function}
+     * @param {object} obj Объект
+     * @param {string} property Свойство
+     * @returns {boolean}
      */
-    object.hasOwnProperty = Object.prototype.hasOwnProperty;
+    object.hasOwnProperty = function(obj, property) {
+        return Object.prototype.hasOwnProperty.call(obj, property);
+    };
 
     /**
      * Колбек вызывается для каждого ключа объекта
@@ -133,7 +138,7 @@ definer('object', /** @exports object */ function(is) {
         var key;
 
         if(object.isNeedHasOwnProperty(obj)) {
-            for(key in obj) if(object.hasOwnProperty.call(obj, key)) {
+            for(key in obj) if(object.hasOwnProperty(obj, key)) {
                 callback.call(context || this, key, obj[key]);
             }
         } else {
