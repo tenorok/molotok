@@ -198,6 +198,13 @@ definer('objectTest', function(assert, object) {
             ]);
         });
 
+        it('Проверить контекст в колбеке итерирования по объекту', function() {
+            var obj = { a: 1 };
+            object.each(obj, function() {
+                assert.deepEqual(this, obj);
+            });
+        });
+
         it('Проитерироваться по объекту с указанием контекста', function() {
             var context = {};
             object.each({ a: 1 }, function() {

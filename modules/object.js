@@ -55,7 +55,7 @@ definer('object', /** @exports object */ function(is) {
                     isMapSourceItem = is.map(sourceVal);
 
                 if(is.map(objVal) && isMapSourceItem) {
-                    original[key] = this.deepExtend(objVal, sourceVal);
+                    original[key] = object.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
                     original[key] = object.clone(sourceVal);
                 } else {
@@ -130,7 +130,7 @@ definer('object', /** @exports object */ function(is) {
      *
      * @param {object} obj Объект
      * @param {object~eachCallback} callback Колбек
-     * @param {object} [context] Контекст вызова колбека
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
      * @returns {*}
      */
     object.each = function(obj, callback, context) {
@@ -139,12 +139,12 @@ definer('object', /** @exports object */ function(is) {
 
         if(object.isNeedHasOwnProperty(obj)) {
             for(key in obj) if(object.hasOwnProperty(obj, key)) {
-                result = callback.call(context || this, key, obj[key]);
+                result = callback.call(context || obj, key, obj[key]);
                 if(result !== undefined) return result;
             }
         } else {
             for(key in obj) {
-                result = callback.call(context || this, key, obj[key]);
+                result = callback.call(context || obj, key, obj[key]);
                 if(result !== undefined) return result;
             }
         }
