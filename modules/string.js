@@ -117,22 +117,24 @@ definer('string', /** @exports string */ function(is) {
      * Перевести строку или заданный символ в верхний регистр.
      *
      * @param {string} string Строка
-     * @param {number} [index] Порядковый номер символа
+     * @param {number} [indexA] Порядковый номер символа
+     * @param {number} [indexB] Порядковый номер символа для указания промежутка
      * @returns {string}
      */
-    string.upper = function(string, index) {
-        return this._changeCase('toUpperCase', string, index);
+    string.upper = function(string, indexA, indexB) {
+        return this._changeCase('toUpperCase', string, indexA, indexB);
     };
 
     /**
      * Перевести строку или заданный символ в нижний регистр.
      *
      * @param {string} string Строка
-     * @param {number} [index] Порядковый номер символа
+     * @param {number} [indexA] Порядковый номер символа
+     * @param {number} [indexB] Порядковый номер символа для указания промежутка
      * @returns {string}
      */
-    string.lower = function(string, index) {
-        return this._changeCase('toLowerCase', string, index);
+    string.lower = function(string, indexA, indexB) {
+        return this._changeCase('toLowerCase', string, indexA, indexB);
     };
 
     /**
@@ -141,16 +143,24 @@ definer('string', /** @exports string */ function(is) {
      * @private
      * @param {string} method Имя метода для смены регистра
      * @param {string} string Строка
-     * @param {number} [index] Порядковый номер символа
+     * @param {number} [indexA] Порядковый номер символа
+     * @param {number} [indexB] Порядковый номер символа для указания промежутка
      * @returns {string}
      */
-    string._changeCase = function(method, string, index) {
-        if(is.undefined(index)) {
+    string._changeCase = function(method, string, indexA, indexB) {
+        if(is.undefined(indexA)) {
             return string[method]();
         }
-        return string.slice(0, index) +
-            string.charAt(index)[method]() +
-            string.slice(index + 1);
+
+        if(is.undefined(indexB)) {
+            return string.slice(0, indexA) +
+                string.charAt(indexA)[method]() +
+                string.substring(indexA + 1);
+        }
+
+        return string.slice(0, indexA) +
+            string.substring(indexA, indexB)[method]() +
+            string.substring(indexB);
     };
 
     /**
