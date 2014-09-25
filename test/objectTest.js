@@ -167,5 +167,59 @@ definer('objectTest', function(assert, object) {
             delete Object.prototype.z;
         });
 
+        it('Проитерироваться по объекту', function() {
+            var items = [];
+            object.each({ a: 'first', b: 100, c: true, d: null }, function(key, val) {
+                items.push({ key: key, val: val });
+            });
+            assert.deepEqual(items, [
+                { key: 'a', val: 'first' },
+                { key: 'b', val: 100 },
+                { key: 'c', val: true },
+                { key: 'd', val: null }
+            ]);
+        });
+
+        it('Проитерироваться по объекту с прототипом', function() {
+
+            function Foo() {
+                this.a = 20;
+                this.b = true;
+            }
+            Foo.prototype = { hasOwnProperty: null, p: 500 };
+
+            var items = [];
+            object.each(new Foo(), function(key, val) {
+                items.push({ key: key, val: val });
+            });
+            assert.deepEqual(items, [
+                { key: 'a', val: 20 },
+                { key: 'b', val: true }
+            ]);
+        });
+
+        it('Проверить контекст в колбеке итерирования по объекту', function() {
+            var obj = { a: 1 };
+            object.each(obj, function() {
+                assert.deepEqual(this, obj);
+            });
+        });
+
+        it('Проитерироваться по объекту с указанием контекста', function() {
+            var context = {};
+            object.each({ a: 1 }, function() {
+                assert.deepEqual(this, context);
+            }, context);
+        });
+
+        it('Проитерироваться по объекту и прервать перебор', function() {
+            var vals = [];
+            object.each({ a: 1, b: 2, c: 3, d: 4 }, function(key, val) {
+                if(val === 3) return false;
+                vals.push(val);
+            }, context);
+            assert.deepEqual(vals, [1, 2]);
+        });
+
     });
 });
