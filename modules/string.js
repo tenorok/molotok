@@ -31,6 +31,29 @@ definer('string', /** @exports string */ function(is) {
     };
 
     /**
+     * Разэкранировать строку текста.
+     *
+     * @param {string} string Строка
+     * @returns {string}
+     */
+    string.unEscape = function(string) {
+        var stringEscapes = {
+            '\\\\': '\\',
+            '\\"': '"',
+            '\\\'': '\'',
+            '\\n': '\n',
+            '\\r': '\r',
+            '\\t': '\t',
+            '\\u2028': '\u2028',
+            '\\u2029': '\u2029'
+        };
+
+        return string.replace(/\\"|\\'|\\n|\\r|\\t|\\u2028|\\u2029|\\\\/g, function(match) {
+            return stringEscapes[match];
+        });
+    };
+
+    /**
      * Заэкранировать html-строку.
      *
      * @param {string} string Строка

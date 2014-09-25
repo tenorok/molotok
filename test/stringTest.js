@@ -5,6 +5,10 @@ definer('stringTest', function(assert, string) {
             assert.equal(string.escape('\\,"\'\n\r\t\u2028\u2029'), '\\\\,\\"\\\'\\n\\r\\t\\u2028\\u2029');
         });
 
+        it('Разэкранировать строку текста', function() {
+            assert.equal(string.unEscape('\\\\,\\"\\\'\\n\\r\\t\\u2028\\u2029'), '\\,"\'\n\r\t\u2028\u2029');
+        });
+
         it('Экранировать html-строку', function() {
             assert.equal(string.htmlEscape('&<>"\'\/'), '&amp;&lt;&gt;&quot;&#39;\/');
         });
