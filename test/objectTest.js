@@ -221,5 +221,90 @@ definer('objectTest', function(assert, object) {
             assert.deepEqual(vals, [1, 2]);
         });
 
+        it('Рекурсивно проитерироваться по объекту', function() {
+            var items = [];
+            object.deepEach({
+                a: 'first',
+                b: { b1: 100, b2: { b21: 200 }},
+                c: { c1: { c11: true, c12: false }, c2: 'second' },
+                d: null
+            }, function(key, val) {
+                items.push({ key: key, val: val });
+            });
+            assert.deepEqual(items, [
+                { key: 'a', val: 'first' },
+                { key: 'b1', val: 100 },
+                { key: 'b21', val: 200 },
+                { key: 'c11', val: true },
+                { key: 'c12', val: false },
+                { key: 'c2', val: 'second' },
+                { key: 'd', val: null }
+            ]);
+        });
+
+        it('Рекурсивно проитерироваться по объекту с прототипом', function() {
+
+            Object.prototype.z = 100;
+
+            var items = [];
+            object.deepEach({
+                a: 100,
+                b: {
+                    b1: 200,
+                    b2: {
+                        b21: 20,
+                        b22: true
+                    }
+                }
+            }, function(key, val) {
+                items.push({ key: key, val: val });
+            });
+            assert.deepEqual(items, [
+                { key: 'a', val: 100 },
+                { key: 'b1', val: 200 },
+                { key: 'b21', val: 20 },
+                { key: 'b22', val: true }
+            ]);
+
+            delete Object.prototype.z;
+        });
+
+        it('Проверить контекст в колбеке рекурсивного итерирования по объекту', function() {
+            var obj = { a: 1 };
+            object.deepEach(obj, function() {
+                assert.deepEqual(this, obj);
+            });
+        });
+
+        it('Рекурсивно проитерироваться по объекту с указанием контекста', function() {
+            var context = {};
+            object.deepEach({ a: 1 }, function() {
+                assert.deepEqual(this, context);
+            }, context);
+        });
+
+        it('Рекурсивно проитерироваться по объекту и прервать перебор', function() {
+            var vals = [];
+            object.deepEach({
+                a: 100,
+                b: 'first',
+                c: {
+                    c1: 200,
+                    c2: false,
+                    c3: {
+                        c31: 20,
+                        c32: true
+                    },
+                    c4: null
+                },
+                d: 300,
+                e: 'second'
+            }, function(key, val) {
+                if(val === true) return false;
+                vals.push(val);
+            }, context);
+            assert.deepEqual(vals, [100, 'first', 200, false, 20]);
+        });
+
     });
 });
