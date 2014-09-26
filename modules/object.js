@@ -11,7 +11,7 @@ definer('object', /** @exports object */ function(is) {
      * Проверить необходимость использования hasOwnProperty
      * при переборе свойств объекта.
      *
-     * @param {object} obj Объект для перебора
+     * @param {object} obj Объект для проверки
      * @returns {boolean}
      */
     object.isNeedHasOwnProperty = function(obj) {
@@ -69,7 +69,7 @@ definer('object', /** @exports object */ function(is) {
     /**
      * Проверить объект на наличие полей.
      *
-     * @param {object} obj Объект
+     * @param {object} obj Объект для проверки
      * @returns {boolean}
      */
     object.isEmpty = function(obj) {
@@ -106,7 +106,7 @@ definer('object', /** @exports object */ function(is) {
      * Проверить принадлежность свойства
      * объекту с помощью hasOwnProperty.
      *
-     * @param {object} obj Объект
+     * @param {object} obj Объект для проверки
      * @param {string} property Свойство
      * @returns {boolean}
      */

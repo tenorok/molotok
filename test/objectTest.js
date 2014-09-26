@@ -214,10 +214,10 @@ definer('objectTest', function(assert, object) {
 
         it('Проитерироваться по объекту и прервать перебор', function() {
             var vals = [];
-            object.each({ a: 1, b: 2, c: 3, d: 4 }, function(key, val) {
+            assert.isFalse(object.each({ a: 1, b: 2, c: 3, d: 4 }, function(key, val) {
                 if(val === 3) return false;
                 vals.push(val);
-            }, context);
+            }, context));
             assert.deepEqual(vals, [1, 2]);
         });
 
@@ -285,7 +285,7 @@ definer('objectTest', function(assert, object) {
 
         it('Рекурсивно проитерироваться по объекту и прервать перебор', function() {
             var vals = [];
-            object.deepEach({
+            assert.isFalse(object.deepEach({
                 a: 100,
                 b: 'first',
                 c: {
@@ -302,7 +302,7 @@ definer('objectTest', function(assert, object) {
             }, function(key, val) {
                 if(val === true) return false;
                 vals.push(val);
-            }, context);
+            }, context));
             assert.deepEqual(vals, [100, 'first', 200, false, 20]);
         });
 
