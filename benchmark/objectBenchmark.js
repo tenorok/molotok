@@ -58,5 +58,53 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
+        ops.each = 3700000;
+        it('Проитерироваться по ключам объекта / ' + format(ops.each), function(done) {
+            new Benchmark.Suite()
+                .add('each', function() {
+                    object.each({ a: 1, b: true, c: null, d: { d1: 25 }, e: 'hello' }, function() {});
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+
+                    result.target.hz < ops.each
+                        ? done(new Error('Slower than ' + format(ops.each)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
+        ops.deepEach = 90000;
+        it('Рекурсивно проитерироваться по ключам объекта / ' + format(ops.deepEach), function(done) {
+            new Benchmark.Suite()
+                .add('deepEach', function() {
+                    object.deepEach({
+                        a: 100,
+                        b: 'first',
+                        c: {
+                            c1: 200,
+                            c2: false,
+                            c3: {
+                                c31: 20,
+                                c32: true
+                            },
+                            c4: null
+                        },
+                        d: 300,
+                        e: 'second'
+                    }, function() {});
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+
+                    result.target.hz < ops.deepEach
+                        ? done(new Error('Slower than ' + format(ops.deepEach)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
     });
 });
