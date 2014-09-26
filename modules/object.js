@@ -162,30 +162,19 @@ definer('object', /** @exports object */ function(is) {
         var key,
             val,
             result,
-            deepResult;
+            deepResult,
+            needHasOwnProperty = object.isNeedHasOwnProperty(obj);
 
-        if(object.isNeedHasOwnProperty(obj)) {
-            for(key in obj) if(object.hasOwnProperty(obj, key)) {
-                val = obj[key];
-                if(is.map(val)) {
-                    deepResult = object.deepEach(val, callback, context);
-                    if(deepResult !== undefined) return deepResult;
-                    continue;
-                }
-                result = callback.call(context || obj, key, val);
-                if(result !== undefined) return result;
+        for(key in obj) {
+            if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
+            val = obj[key];
+            if(is.map(val)) {
+                deepResult = object.deepEach(val, callback, context);
+                if(deepResult !== undefined) return deepResult;
+                continue;
             }
-        } else {
-            for(key in obj) {
-                val = obj[key];
-                if(is.map(val)) {
-                    deepResult = object.deepEach(val, callback, context);
-                    if(deepResult !== undefined) return deepResult;
-                    continue;
-                }
-                result = callback.call(context || obj, key, val);
-                if(result !== undefined) return result;
-            }
+            result = callback.call(context || obj, key, val);
+            if(result !== undefined) return result;
         }
     };
 
