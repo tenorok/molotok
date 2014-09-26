@@ -55,10 +55,15 @@ var molotok = require('molotok');
 - [Модуль `number`](#Модуль-number)
   - [Метод `number.random`](#Метод-numberrandom)
 - [Модуль `object`](#Модуль-object)
+  - [Метод `object.isNeedHasOwnProperty`](#Метод-objectisneedhasownproperty)
+  - [Метод `object.hasOwnProperty`](#Метод-objecthasownproperty)
+  - [Метод `object.isEmpty`](#Метод-objectisempty)
   - [Метод `object.extend`](#Метод-objectextend)
   - [Метод `object.deepExtend`](#Метод-objectdeepextend)
   - [Метод `object.clone`](#Метод-objectclone)
   - [Метод `object.deepClone`](#Метод-objectdeepclone)
+  - [Метод `object.each`](#Метод-objecteach)
+  - [Метод `object.deepEach`](#Метод-objectdeepeach)
 - [Модуль `functions`](#Модуль-functions)
   - [Метод `functions.apply`](#Метод-functionsapply)
 
@@ -263,13 +268,48 @@ var molotok = require('molotok');
 
 ### Модуль `object`
 
+#### Метод `object.isNeedHasOwnProperty`
+
+Проверить необходимость использования `hasOwnProperty` при переборе
+свойств объекта циклом `for...in`.
+
+Метод `hasOwnProperty` достаточно затратен и его можно
+не использовать без необходимости.
+
+Параметры:
+* `{object}` `obj` — объект для проверки
+
+Возвращает: `{boolean}`
+
+#### Метод `object.hasOwnProperty`
+
+Проверить принадлежность свойства объекту с помощью нативного `hasOwnProperty`.
+
+Этот метод можно уверенно применять для любого объекта,
+даже если у него задано поле `hasOwnProperty`.
+
+Параметры:
+* `{object}` `obj` — объект для проверки
+* `{string}` `property` — свойство
+
+Возвращает: `{boolean}`
+
+#### Метод `object.isEmpty`
+
+Проверить объект на наличие полей.
+
+Параметры:
+* `{object}` `obj` — объект для проверки
+
+Возвращает: `{boolean}`
+
 #### Метод `object.extend`
 
 Расширяет объект.
 
 Параметры:
 
-* `{object}` `object` — расширяемый объект
+* `{object}` `obj` — расширяемый объект
 * `{...object}` `source` — расширяющие объекты в любом количестве
 
 Возвращает: `{object}`
@@ -280,7 +320,7 @@ var molotok = require('molotok');
 
 Параметры:
 
-* `{object}` `object` — расширяемый объект
+* `{object}` `obj` — расширяемый объект
 * `{...object}` `source` — расширяющие объекты в любом количестве
 
 Возвращает: `{object}`
@@ -291,7 +331,7 @@ var molotok = require('molotok');
 
 Параметры:
 
-* `{object}` `object` — клонируемый объект
+* `{object}` `obj` — клонируемый объект
 
 Возвращает: `{object}`
 
@@ -301,9 +341,49 @@ var molotok = require('molotok');
 
 Параметры:
 
-* `{object}` `object` — клонируемый объект
+* `{object}` `obj` — клонируемый объект
 
 Возвращает: `{object}`
+
+#### Метод `object.each`
+
+Проитерироваться по ключам объекта.
+
+Параметры:
+
+* `{object}` `obj` — перебираемый объект
+* `{function}` `callback` — колбек вызывается для каждого ключа объекта
+* `{object}` `[context=obj]` — контекст вызова колбека, по умолчанию перебираемый объект
+
+Параметры колбека:
+
+* `{string}` `key` — ключ перебираемого объекта
+* `{*}` `val` — значение ключа
+
+При возвращении колбеком любого значения, кроме `undefined`,
+перебор останавливается и метод `each` возвращает это значение.
+
+Возвращает: `{*}` — результат выполнения колбека
+
+#### Метод `object.deepEach`
+
+Проитерироваться по ключам объекта рекурсивно.
+
+Параметры:
+
+* `{object}` `obj` — перебираемый объект
+* `{function}` `callback` — колбек вызывается для каждого ключа объекта
+* `{object}` `[context=obj]` — контекст вызова колбека, по умолчанию перебираемый объект
+
+Параметры колбека:
+
+* `{string}` `key` — ключ перебираемого объекта
+* `{*}` `val` — значение ключа
+
+При возвращении колбеком любого значения, кроме `undefined`,
+перебор останавливается и метод `each` возвращает это значение.
+
+Возвращает: `{*}` — результат выполнения колбека
 
 ### Модуль `functions`
 
