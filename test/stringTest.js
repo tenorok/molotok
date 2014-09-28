@@ -5,6 +5,10 @@ definer('stringTest', function(assert, string) {
             assert.equal(string.escape('\\,"\'\n\r\t\u2028\u2029'), '\\\\,\\"\\\'\\n\\r\\t\\u2028\\u2029');
         });
 
+        it('Разэкранировать строку текста', function() {
+            assert.equal(string.unEscape('\\\\,\\"\\\'\\n\\r\\t\\u2028\\u2029'), '\\,"\'\n\r\t\u2028\u2029');
+        });
+
         it('Экранировать html-строку', function() {
             assert.equal(string.htmlEscape('&<>"\'\/'), '&amp;&lt;&gt;&quot;&#39;\/');
         });
@@ -30,6 +34,11 @@ definer('stringTest', function(assert, string) {
             assert.equal(string.upper('abcd', 2), 'abCd');
         });
 
+        it('Перевести несколько символов строки в верхний регистр', function() {
+            assert.equal(string.upper('abcd', 0, 2), 'ABcd');
+            assert.equal(string.upper('abcd', 2, 4), 'abCD');
+        });
+
         it('Перевести строку в нижний регистр', function() {
             assert.equal(string.lower('ABCD'), 'abcd');
         });
@@ -37,6 +46,11 @@ definer('stringTest', function(assert, string) {
         it('Перевести заданный символ строки в нижний регистр', function() {
             assert.equal(string.lower('ABCD', 0), 'aBCD');
             assert.equal(string.lower('ABCD', 2), 'ABcD');
+        });
+
+        it('Перевести несколько символов строки в нижний регистр', function() {
+            assert.equal(string.lower('ABCD', 0, 3), 'abcD');
+            assert.equal(string.lower('ABCD', 1, 4), 'Abcd');
         });
 
         it('Повторить строку заданное количество раз', function() {

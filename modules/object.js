@@ -11,12 +11,12 @@ definer('object', /** @exports object */ function(is) {
      * Проверить необходимость использования hasOwnProperty
      * при переборе свойств объекта.
      *
-     * @param {object} original Объект для перебора
+     * @param {object} obj Объект для проверки
      * @returns {boolean}
      */
-    object.isNeedHasOwnProperty = function(original) {
+    object.isNeedHasOwnProperty = function(obj) {
         for(key in {}) return true;
-        for(var key in Object.getPrototypeOf(original)) return true;
+        for(var key in Object.getPrototypeOf(obj)) return true;
         return false;
     };
 
@@ -69,14 +69,14 @@ definer('object', /** @exports object */ function(is) {
     /**
      * Проверить объект на наличие полей.
      *
-     * @param {object} original Объект
+     * @param {object} obj Объект для проверки
      * @returns {boolean}
      */
-    object.isEmpty = function(original) {
-        original = original || {};
-        var needHasOwnProperty = object.isNeedHasOwnProperty(original);
-        for(var key in original) {
-            if(needHasOwnProperty && !original.hasOwnProperty(key)) continue;
+    object.isEmpty = function(obj) {
+        obj = obj || {};
+        var needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+        for(var key in obj) {
+            if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
             return false;
         }
         return true;
@@ -106,7 +106,7 @@ definer('object', /** @exports object */ function(is) {
      * Проверить принадлежность свойства
      * объекту с помощью hasOwnProperty.
      *
-     * @param {object} obj Объект
+     * @param {object} obj Объект для проверки
      * @param {string} property Свойство
      * @returns {boolean}
      */
@@ -116,7 +116,7 @@ definer('object', /** @exports object */ function(is) {
 
     /**
      * Колбек вызывается для каждого ключа объекта
-     * при переборе методом `each`.
+     * при переборе методами `each` и `deepEach`.
      *
      * @callback object~eachCallback
      * @param {string} key Ключ
@@ -147,6 +147,34 @@ definer('object', /** @exports object */ function(is) {
                 result = callback.call(context || obj, key, obj[key]);
                 if(result !== undefined) return result;
             }
+        }
+    };
+
+    /**
+     * Проитерироваться по ключам объекта рекурсивно.
+     *
+     * @param {object} obj Объект
+     * @param {object~eachCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {*}
+     */
+    object.deepEach = function(obj, callback, context) {
+        var key,
+            val,
+            result,
+            deepResult,
+            needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+
+        for(key in obj) {
+            if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
+            val = obj[key];
+            if(is.map(val)) {
+                deepResult = object.deepEach(val, callback, context);
+                if(deepResult !== undefined) return deepResult;
+                continue;
+            }
+            result = callback.call(context || obj, key, val);
+            if(result !== undefined) return result;
         }
     };
 
