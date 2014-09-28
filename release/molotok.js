@@ -2,8 +2,8 @@
  * @file Helpers for enjoying the development.
  * @copyright 2014 Artem Kurbatov, tenorok.ru
  * @license MIT license
- * @version 0.1.0-alpha.2
- * @date 2 September 2014
+ * @version 0.1.0
+ * @date 28 September 2014
  */
 (function(global, undefined) {
 var definer = {
@@ -254,8 +254,9 @@ is = (function () {
                 }
             }
 
-            var last;
-            for(var i in this) { last = i; }
+            var keys = Object.keys(this),
+                last = keys[keys.length - 1];
+
             return is.undefined(last) || this.hasOwnProperty(last);
         });
     };
@@ -294,20 +295,19 @@ is = (function () {
      * @returns {string}
      */
     is.type = function(subject) {
-        var args = arguments,
-            firstType;
+        var firstType,
+            types = ['string', 'number', 'nan', 'boolean', 'null', 'undefined', 'array',
+                'argument', 'native', 'function', 'map', 'date', 'regexp'];
 
-        ['string', 'number', 'nan', 'boolean', 'null', 'undefined', 'array',
-         'argument', 'native', 'function', 'map', 'date', 'regexp'].some(function(type) {
-            if(is[type](args[0])) {
+        for(var i = 0, len = types.length; i < len; i++) {
+            var type = types[i];
+            if(is[type](arguments[0])) {
                 firstType = type;
-                return true;
-            } else {
-                return false;
+                break;
             }
-        });
+        }
 
-        return is._every(args, function(that) {
+        return is._every(arguments, function(that) {
             return is[firstType](that);
         }) ? firstType : 'mixed';
     };
@@ -345,9 +345,13 @@ is = (function () {
      * @returns {boolean}
      */
     is._every = function(args, callback) {
-        return Object.keys(args).every(function(arg) {
-            return callback.call(args[arg], args[arg]);
-        });
+        for(var i = 0, len = args.length; i < len; i++) {
+            var a = args[i];
+            if(!callback.call(a, a)) {
+                return false;
+            }
+        }
+        return true;
     };
 
     /**
@@ -408,6 +412,29 @@ string = (function (is) {
 
         return string.replace(/["'\n\r\t\u2028\u2029\\]/g, function(match) {
             return '\\' + stringEscapes[match];
+        });
+    };
+
+    /**
+     * Разэкранировать строку текста.
+     *
+     * @param {string} string Строка
+     * @returns {string}
+     */
+    string.unEscape = function(string) {
+        var stringEscapes = {
+            '\\\\': '\\',
+            '\\"': '"',
+            '\\\'': '\'',
+            '\\n': '\n',
+            '\\r': '\r',
+            '\\t': '\t',
+            '\\u2028': '\u2028',
+            '\\u2029': '\u2029'
+        };
+
+        return string.replace(/\\"|\\'|\\n|\\r|\\t|\\u2028|\\u2029|\\\\/g, function(match) {
+            return stringEscapes[match];
         });
     };
 
@@ -475,22 +502,24 @@ string = (function (is) {
      * Перевести строку или заданный символ в верхний регистр.
      *
      * @param {string} string Строка
-     * @param {number} [index] Порядковый номер символа
+     * @param {number} [indexA] Порядковый номер символа
+     * @param {number} [indexB] Порядковый номер символа для указания промежутка
      * @returns {string}
      */
-    string.upper = function(string, index) {
-        return this._changeCase('toUpperCase', string, index);
+    string.upper = function(string, indexA, indexB) {
+        return this._changeCase('toUpperCase', string, indexA, indexB);
     };
 
     /**
      * Перевести строку или заданный символ в нижний регистр.
      *
      * @param {string} string Строка
-     * @param {number} [index] Порядковый номер символа
+     * @param {number} [indexA] Порядковый номер символа
+     * @param {number} [indexB] Порядковый номер символа для указания промежутка
      * @returns {string}
      */
-    string.lower = function(string, index) {
-        return this._changeCase('toLowerCase', string, index);
+    string.lower = function(string, indexA, indexB) {
+        return this._changeCase('toLowerCase', string, indexA, indexB);
     };
 
     /**
@@ -499,16 +528,24 @@ string = (function (is) {
      * @private
      * @param {string} method Имя метода для смены регистра
      * @param {string} string Строка
-     * @param {number} [index] Порядковый номер символа
+     * @param {number} [indexA] Порядковый номер символа
+     * @param {number} [indexB] Порядковый номер символа для указания промежутка
      * @returns {string}
      */
-    string._changeCase = function(method, string, index) {
-        if(is.undefined(index)) {
+    string._changeCase = function(method, string, indexA, indexB) {
+        if(is.undefined(indexA)) {
             return string[method]();
         }
-        return string.slice(0, index) +
-            string.charAt(index)[method]() +
-            string.slice(index + 1);
+
+        if(is.undefined(indexB)) {
+            return string.slice(0, indexA) +
+                string.charAt(indexA)[method]() +
+                string.substring(indexA + 1);
+        }
+
+        return string.slice(0, indexA) +
+            string.substring(indexA, indexB)[method]() +
+            string.substring(indexB);
     };
 
     /**
@@ -581,56 +618,78 @@ object = (function (is) {
     function object() {}
 
     /**
+     * Проверить необходимость использования hasOwnProperty
+     * при переборе свойств объекта.
+     *
+     * @param {object} obj Объект для проверки
+     * @returns {boolean}
+     */
+    object.isNeedHasOwnProperty = function(obj) {
+        for(key in {}) return true;
+        for(var key in Object.getPrototypeOf(obj)) return true;
+        return false;
+    };
+
+    /**
      * Расширить объект.
      *
-     * @param {object} object Расширяемый объект
+     * @param {object} original Расширяемый объект
      * @param {...object} source Расширяющие объекты
      * @returns {object}
      */
-    object.extend = function(object, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                extended[key] = source[key];
-                return extended;
-            }, object);
-        }, object);
+    object.extend = function(original, source) {
+        for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            var sourceObj = arguments[s],
+                key;
+
+            if(object.isNeedHasOwnProperty(sourceObj)) {
+                for(key in sourceObj) if(object.hasOwnProperty(sourceObj, key)) original[key] = sourceObj[key];
+            } else {
+                for(key in sourceObj) original[key] = sourceObj[key];
+            }
+        }
+        return original;
     };
 
     /**
      * Расширить объект рекурсивно.
      *
-     * @param {object} obj Расширяемый объект
+     * @param {object} original Расширяемый объект
      * @param {...object} source Расширяющие объекты
      * @returns {object}
      */
-    object.deepExtend = function(obj, source) {
-        return [].slice.call(arguments, 1).reduce(function(object, source) {
-            return Object.keys(source).reduce(function(extended, key) {
-                var extendedItem = extended[key],
-                    sourceItem = source[key],
-                    isMapSourceItem = is.map(sourceItem);
+    object.deepExtend = function(original, source) {
+        for(var s = 1, sLen = arguments.length; s < sLen; s++) {
+            object.each(arguments[s], function(key, sourceVal) {
+                var objVal = original[key],
+                    isMapSourceItem = is.map(sourceVal);
 
-                if(is.map(extendedItem) && isMapSourceItem) {
-                    extended[key] = this.deepExtend(extendedItem, sourceItem);
+                if(is.map(objVal) && isMapSourceItem) {
+                    original[key] = object.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
-                    extended[key] = object.clone(sourceItem);
+                    original[key] = object.clone(sourceVal);
                 } else {
-                    extended[key] = sourceItem;
+                    original[key] = sourceVal;
                 }
-
-                return extended;
-            }.bind(this), obj);
-        }.bind(this), object);
+            });
+        }
+        return original;
     };
 
     /**
      * Проверить объект на наличие полей.
      *
-     * @param {object} object Объект
+     * @param {object} obj Объект для проверки
      * @returns {boolean}
      */
-    object.isEmpty = function(object) {
-        return !Object.keys(object || {}).length;
+    object.isEmpty = function(obj) {
+        obj = obj || {};
+        var needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+        for(var key in obj) {
+            if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
+            return false;
+        }
+        return true;
     };
 
     /**
@@ -651,6 +710,82 @@ object = (function (is) {
      */
     object.deepClone = function(obj) {
         return object.deepExtend({}, obj);
+    };
+
+    /**
+     * Проверить принадлежность свойства
+     * объекту с помощью hasOwnProperty.
+     *
+     * @param {object} obj Объект для проверки
+     * @param {string} property Свойство
+     * @returns {boolean}
+     */
+    object.hasOwnProperty = function(obj, property) {
+        return Object.prototype.hasOwnProperty.call(obj, property);
+    };
+
+    /**
+     * Колбек вызывается для каждого ключа объекта
+     * при переборе методами `each` и `deepEach`.
+     *
+     * @callback object~eachCallback
+     * @param {string} key Ключ
+     * @param {*} val Значение
+     * @returns {undefined|*} При возвращении любого значения, кроме `undefined`,
+     * перебор останавливается и метод `each` возвращает это значение
+     */
+
+    /**
+     * Проитерироваться по ключам объекта.
+     *
+     * @param {object} obj Объект
+     * @param {object~eachCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {*}
+     */
+    object.each = function(obj, callback, context) {
+        var key,
+            result;
+
+        if(object.isNeedHasOwnProperty(obj)) {
+            for(key in obj) if(object.hasOwnProperty(obj, key)) {
+                result = callback.call(context || obj, key, obj[key]);
+                if(result !== undefined) return result;
+            }
+        } else {
+            for(key in obj) {
+                result = callback.call(context || obj, key, obj[key]);
+                if(result !== undefined) return result;
+            }
+        }
+    };
+
+    /**
+     * Проитерироваться по ключам объекта рекурсивно.
+     *
+     * @param {object} obj Объект
+     * @param {object~eachCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {*}
+     */
+    object.deepEach = function(obj, callback, context) {
+        var key,
+            val,
+            result,
+            deepResult,
+            needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+
+        for(key in obj) {
+            if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
+            val = obj[key];
+            if(is.map(val)) {
+                deepResult = object.deepEach(val, callback, context);
+                if(deepResult !== undefined) return deepResult;
+                continue;
+            }
+            result = callback.call(context || obj, key, val);
+            if(result !== undefined) return result;
+        }
     };
 
     return object;
