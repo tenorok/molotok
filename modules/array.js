@@ -1,4 +1,4 @@
-definer('array', /** @exports array */ function() {
+definer('array', /** @exports array */ function(is) {
 
     /**
      * Модуль работы с массивами.
@@ -17,12 +17,37 @@ definer('array', /** @exports array */ function() {
      */
     array.pushOnce = function(arr, element) {
         var elements = Array.prototype.slice.call(arguments, 1);
-        for(var i = 0, len = elements.length; i < len; i++) {
+        for(var i = 0; i < elements.length; i++) {
             if(!~arr.indexOf(elements[i])) {
                 arr.push(elements[i]);
             }
         }
         return arr.length;
+    };
+
+    /**
+     * Добавить отдельные элементы и элементы других массивов в массив без повтора.
+     * Дополненный аналог стандартного метода `Array.prototype.concat`.
+     *
+     * @param {array} arr Массив
+     * @param {...*} element Элементы для добавления
+     * @returns {array} Новый массив
+     */
+    array.concatOnce = function(arr, element) {
+        var elements = Array.prototype.slice.call(arguments, 1),
+            newArr = arr.slice();
+
+        for(var i = 0; i < elements.length; i++) {
+            if(is.array(elements[i])) {
+                for(var j = 0; j < elements[i].length; j++) {
+                    array.pushOnce(newArr, elements[i][j]);
+                }
+            } else {
+                array.pushOnce(newArr, elements[i]);
+            }
+        }
+
+        return newArr;
     };
 
     return array;
