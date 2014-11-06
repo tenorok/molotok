@@ -8,7 +8,6 @@
         "do",
         "try",
         "catch",
-        "case",
         "default"
     ],
     "disallowSpaceAfterKeywords": [

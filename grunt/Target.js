@@ -6,6 +6,7 @@ Target.definer = function() {
             'is',
             'string',
             'number',
+            'array',
             'object',
             'functions'
         ],

@@ -154,6 +154,24 @@ definer('objectTest', function(assert, object) {
             assert.equal(a.b.c, 100);
         });
 
+        it('Клонировать глубокий объект рекурсивно', function() {
+            var o = {
+                    a: 10,
+                    c: {
+                        c1: 20,
+                        c3: {
+                            c31: 30
+                        },
+                        c4: 40
+                    },
+                    d: 50
+                },
+                o2 = object.deepClone(o);
+
+            o2.c.c3.c31 = 35;
+            assert.equal(o.c.c3.c31, 30);
+        });
+
         it('Проверить необходимость использования hasOwnProperty', function() {
             assert.isFalse(object.isNeedHasOwnProperty({}));
 
@@ -168,9 +186,11 @@ definer('objectTest', function(assert, object) {
         });
 
         it('Проитерироваться по объекту', function() {
-            var items = [];
-            object.each({ a: 'first', b: 100, c: true, d: null }, function(key, val) {
+            var items = [],
+                iterateObj = { a: 'first', b: 100, c: true, d: null };
+            object.each(iterateObj, function(key, val, obj) {
                 items.push({ key: key, val: val });
+                assert.deepEqual(obj, iterateObj);
             });
             assert.deepEqual(items, [
                 { key: 'a', val: 'first' },
@@ -217,19 +237,43 @@ definer('objectTest', function(assert, object) {
             assert.isFalse(object.each({ a: 1, b: 2, c: 3, d: 4 }, function(key, val) {
                 if(val === 3) return false;
                 vals.push(val);
-            }, context));
+            }));
             assert.deepEqual(vals, [1, 2]);
         });
 
         it('Рекурсивно проитерироваться по объекту', function() {
-            var items = [];
-            object.deepEach({
-                a: 'first',
-                b: { b1: 100, b2: { b21: 200 }},
-                c: { c1: { c11: true, c12: false }, c2: 'second' },
-                d: null
-            }, function(key, val) {
+            var items = [],
+                iterateObj = {
+                    a: 'first',
+                    b: { b1: 100, b2: { b21: 200 }},
+                    c: { c1: { c11: true, c12: false }, c2: 'second' },
+                    d: null
+                };
+            object.deepEach(iterateObj, function(key, val, obj) {
                 items.push({ key: key, val: val });
+                switch(key) {
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                        assert.deepEqual(obj, iterateObj);
+                        break;
+                    case 'b1':
+                    case 'b2':
+                        assert.deepEqual(obj, { b1: 100, b2: { b21: 200 }});
+                        break;
+                    case 'b21':
+                        assert.deepEqual(obj, { b21: 200 });
+                        break;
+                    case 'c1':
+                    case 'c2':
+                        assert.deepEqual(obj, { c1: { c11: true, c12: false }, c2: 'second' });
+                        break;
+                    case 'c11':
+                    case 'c12':
+                        assert.deepEqual(obj, { c11: true, c12: false });
+                        break;
+                }
             });
             assert.deepEqual(items, [
                 { key: 'a', val: 'first' },
@@ -304,6 +348,76 @@ definer('objectTest', function(assert, object) {
                 vals.push(val);
             }, context));
             assert.deepEqual(vals, [100, 'first', 200, false, 20]);
+        });
+
+        it('Метод map', function() {
+            var o = { a: 1, b: 2, c: 3 },
+                result = { a: undefined, b: 4, c: 6 },
+                context = {};
+            assert.deepEqual(object.map(o, function(key, val, obj) {
+                assert.deepEqual(this, context);
+                assert.deepEqual(obj, o);
+                if(key !== 'a') return val * 2;
+            }, context), result);
+            assert.deepEqual(o, result);
+        });
+
+        it('Метод deepMap', function() {
+            var o = {
+                    a: 10,
+                    c: {
+                        c1: 20,
+                        c3: {
+                            c31: 30
+                        },
+                        c4: 40
+                    },
+                    d: 50
+                },
+                result = {
+                    a: 15,
+                    c: {
+                        c1: 25,
+                        c3: {
+                            c31: 35
+                        },
+                        c4: 45
+                    },
+                    d: 55
+                },
+                context = {};
+            assert.deepEqual(object.deepMap(o, function(key, val, obj) {
+                assert.deepEqual(this, context);
+                switch(key) {
+                    case 'a':
+                    case 'd':
+                        assert.deepEqual(obj, o);
+                        break;
+                    case 'c1':
+                        assert.deepEqual(obj, {
+                            c1: 20,
+                            c3: {
+                                c31: 30
+                            },
+                            c4: 40
+                        });
+                        break;
+                    case 'c4':
+                        assert.deepEqual(obj, {
+                            c1: 25,
+                            c3: {
+                                c31: 35
+                            },
+                            c4: 40
+                        });
+                        break;
+                    case 'c31':
+                        assert.deepEqual(obj, { c31: 30 });
+                        break;
+                }
+                return val + 5;
+            }, context), result);
+            assert.deepEqual(o, result);
         });
 
     });
