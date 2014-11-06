@@ -32,8 +32,8 @@ definer('object', /** @exports object */ function(is) {
             var sourceObj = arguments[s],
                 key;
 
-            if(object.isNeedHasOwnProperty(sourceObj)) {
-                for(key in sourceObj) if(object.hasOwnProperty(sourceObj, key)) original[key] = sourceObj[key];
+            if(this.isNeedHasOwnProperty(sourceObj)) {
+                for(key in sourceObj) if(this.hasOwnProperty(sourceObj, key)) original[key] = sourceObj[key];
             } else {
                 for(key in sourceObj) original[key] = sourceObj[key];
             }
@@ -50,18 +50,18 @@ definer('object', /** @exports object */ function(is) {
      */
     object.deepExtend = function(original, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
-            object.each(arguments[s], function(key, sourceVal) {
+            this.each(arguments[s], function(key, sourceVal) {
                 var objVal = original[key],
                     isMapSourceItem = is.map(sourceVal);
 
                 if(is.map(objVal) && isMapSourceItem) {
-                    original[key] = object.deepExtend(objVal, sourceVal);
+                    original[key] = this.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
-                    original[key] = object.clone(sourceVal);
+                    original[key] = this.deepClone(sourceVal);
                 } else {
                     original[key] = sourceVal;
                 }
-            });
+            }, this);
         }
         return original;
     };
@@ -74,7 +74,7 @@ definer('object', /** @exports object */ function(is) {
      */
     object.isEmpty = function(obj) {
         obj = obj || {};
-        var needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+        var needHasOwnProperty = this.isNeedHasOwnProperty(obj);
         for(var key in obj) {
             if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
             return false;
@@ -89,7 +89,7 @@ definer('object', /** @exports object */ function(is) {
      * @returns {object}
      */
     object.clone = function(obj) {
-        return object.extend({}, obj);
+        return this.extend({}, obj);
     };
 
     /**
@@ -99,7 +99,7 @@ definer('object', /** @exports object */ function(is) {
      * @returns {object}
      */
     object.deepClone = function(obj) {
-        return object.deepExtend({}, obj);
+        return this.deepExtend({}, obj);
     };
 
     /**
@@ -121,6 +121,7 @@ definer('object', /** @exports object */ function(is) {
      * @callback object~eachCallback
      * @param {string} key Ключ
      * @param {*} val Значение
+     * @param {object} Перебираемый объект
      * @returns {undefined|*} При возвращении любого значения, кроме `undefined`,
      * перебор останавливается и метод `each` возвращает это значение
      */
@@ -137,14 +138,14 @@ definer('object', /** @exports object */ function(is) {
         var key,
             result;
 
-        if(object.isNeedHasOwnProperty(obj)) {
-            for(key in obj) if(object.hasOwnProperty(obj, key)) {
-                result = callback.call(context || obj, key, obj[key]);
+        if(this.isNeedHasOwnProperty(obj)) {
+            for(key in obj) if(this.hasOwnProperty(obj, key)) {
+                result = callback.call(context || obj, key, obj[key], obj);
                 if(result !== undefined) return result;
             }
         } else {
             for(key in obj) {
-                result = callback.call(context || obj, key, obj[key]);
+                result = callback.call(context || obj, key, obj[key], obj);
                 if(result !== undefined) return result;
             }
         }
@@ -163,19 +164,60 @@ definer('object', /** @exports object */ function(is) {
             val,
             result,
             deepResult,
-            needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+            needHasOwnProperty = this.isNeedHasOwnProperty(obj);
 
         for(key in obj) {
             if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
             val = obj[key];
             if(is.map(val)) {
-                deepResult = object.deepEach(val, callback, context);
+                deepResult = this.deepEach(val, callback, context);
                 if(deepResult !== undefined) return deepResult;
                 continue;
             }
-            result = callback.call(context || obj, key, val);
+            result = callback.call(context || obj, key, val, obj);
             if(result !== undefined) return result;
         }
+    };
+
+    /**
+     * Колбек вызывается для каждого ключа объекта
+     * при переборе методами `map` и `deepMap`.
+     *
+     * @callback object~mapCallback
+     * @param {string} key Ключ
+     * @param {*} val Значение
+     * @param {object} obj Перебираемый объект
+     * @returns {*} Значение поля
+     */
+
+    /**
+     * Модифицировать значения каждого ключа заданного объекта.
+     *
+     * @param {object} obj Объект
+     * @param {object~mapCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {object} Модифицированный объект
+     */
+    object.map = function(obj, callback, context) {
+        this.each(obj, function(key) {
+            obj[key] = callback.apply(this, arguments);
+        }, context);
+        return obj;
+    };
+
+    /**
+     * Модифицировать значения каждого ключа заданного объекта рекурсивно.
+     *
+     * @param {object} obj Объект
+     * @param {object~mapCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {object} Модифицированный объект
+     */
+    object.deepMap = function(obj, callback, context) {
+        this.deepEach(obj, function(key, val, curObj) {
+            curObj[key] = callback.apply(this, arguments);
+        }, context);
+        return obj;
     };
 
     return object;
