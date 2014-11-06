@@ -154,6 +154,24 @@ definer('objectTest', function(assert, object) {
             assert.equal(a.b.c, 100);
         });
 
+        it('Клонировать глубокий объект рекурсивно', function() {
+            var o = {
+                    a: 10,
+                    c: {
+                        c1: 20,
+                        c3: {
+                            c31: 30
+                        },
+                        c4: 40
+                    },
+                    d: 50
+                },
+                o2 = object.deepClone(o);
+
+            o2.c.c3.c31 = 35;
+            assert.equal(o.c.c3.c31, 30);
+        });
+
         it('Проверить необходимость использования hasOwnProperty', function() {
             assert.isFalse(object.isNeedHasOwnProperty({}));
 

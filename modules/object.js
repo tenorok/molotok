@@ -57,7 +57,7 @@ definer('object', /** @exports object */ function(is) {
                 if(is.map(objVal) && isMapSourceItem) {
                     original[key] = this.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
-                    original[key] = this.clone(sourceVal);
+                    original[key] = this.deepClone(sourceVal);
                 } else {
                     original[key] = sourceVal;
                 }
