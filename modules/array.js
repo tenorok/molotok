@@ -40,10 +40,10 @@ definer('array', /** @exports array */ function(is) {
         for(var i = 0; i < elements.length; i++) {
             if(is.array(elements[i])) {
                 for(var j = 0; j < elements[i].length; j++) {
-                    array.pushOnce(newArr, elements[i][j]);
+                    this.pushOnce(newArr, elements[i][j]);
                 }
             } else {
-                array.pushOnce(newArr, elements[i]);
+                this.pushOnce(newArr, elements[i]);
             }
         }
 

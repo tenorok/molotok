@@ -32,8 +32,8 @@ definer('object', /** @exports object */ function(is) {
             var sourceObj = arguments[s],
                 key;
 
-            if(object.isNeedHasOwnProperty(sourceObj)) {
-                for(key in sourceObj) if(object.hasOwnProperty(sourceObj, key)) original[key] = sourceObj[key];
+            if(this.isNeedHasOwnProperty(sourceObj)) {
+                for(key in sourceObj) if(this.hasOwnProperty(sourceObj, key)) original[key] = sourceObj[key];
             } else {
                 for(key in sourceObj) original[key] = sourceObj[key];
             }
@@ -50,18 +50,18 @@ definer('object', /** @exports object */ function(is) {
      */
     object.deepExtend = function(original, source) {
         for(var s = 1, sLen = arguments.length; s < sLen; s++) {
-            object.each(arguments[s], function(key, sourceVal) {
+            this.each(arguments[s], function(key, sourceVal) {
                 var objVal = original[key],
                     isMapSourceItem = is.map(sourceVal);
 
                 if(is.map(objVal) && isMapSourceItem) {
-                    original[key] = object.deepExtend(objVal, sourceVal);
+                    original[key] = this.deepExtend(objVal, sourceVal);
                 } else if(isMapSourceItem) {
-                    original[key] = object.clone(sourceVal);
+                    original[key] = this.clone(sourceVal);
                 } else {
                     original[key] = sourceVal;
                 }
-            });
+            }, this);
         }
         return original;
     };
@@ -74,7 +74,7 @@ definer('object', /** @exports object */ function(is) {
      */
     object.isEmpty = function(obj) {
         obj = obj || {};
-        var needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+        var needHasOwnProperty = this.isNeedHasOwnProperty(obj);
         for(var key in obj) {
             if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
             return false;
@@ -89,7 +89,7 @@ definer('object', /** @exports object */ function(is) {
      * @returns {object}
      */
     object.clone = function(obj) {
-        return object.extend({}, obj);
+        return this.extend({}, obj);
     };
 
     /**
@@ -99,7 +99,7 @@ definer('object', /** @exports object */ function(is) {
      * @returns {object}
      */
     object.deepClone = function(obj) {
-        return object.deepExtend({}, obj);
+        return this.deepExtend({}, obj);
     };
 
     /**
@@ -137,8 +137,8 @@ definer('object', /** @exports object */ function(is) {
         var key,
             result;
 
-        if(object.isNeedHasOwnProperty(obj)) {
-            for(key in obj) if(object.hasOwnProperty(obj, key)) {
+        if(this.isNeedHasOwnProperty(obj)) {
+            for(key in obj) if(this.hasOwnProperty(obj, key)) {
                 result = callback.call(context || obj, key, obj[key]);
                 if(result !== undefined) return result;
             }
@@ -163,13 +163,13 @@ definer('object', /** @exports object */ function(is) {
             val,
             result,
             deepResult,
-            needHasOwnProperty = object.isNeedHasOwnProperty(obj);
+            needHasOwnProperty = this.isNeedHasOwnProperty(obj);
 
         for(key in obj) {
             if(needHasOwnProperty && !obj.hasOwnProperty(key)) continue;
             val = obj[key];
             if(is.map(val)) {
-                deepResult = object.deepEach(val, callback, context);
+                deepResult = this.deepEach(val, callback, context);
                 if(deepResult !== undefined) return deepResult;
                 continue;
             }
