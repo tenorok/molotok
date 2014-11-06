@@ -55,6 +55,9 @@ var molotok = require('molotok');
   - [Метод `string.repeat`](#Метод-stringrepeat)
 - [Модуль `number`](#Модуль-number)
   - [Метод `number.random`](#Метод-numberrandom)
+- [Модуль `array`](#Модуль-array)
+  - [Метод `array.pushOnce`](#Метод-arraypushonce)
+  - [Метод `array.concatOnce`](#Метод-arrayconcatonce)
 - [Модуль `object`](#Модуль-object)
   - [Метод `object.isNeedHasOwnProperty`](#Метод-objectisneedhasownproperty)
   - [Метод `object.hasOwnProperty`](#Метод-objecthasownproperty)
@@ -195,7 +198,7 @@ var molotok = require('molotok');
 
 #### Метод `string.unHtmlEscape`
 
-Деэкранирование HTML-строки.
+Деэкранирует HTML-строку.
 
 Параметры:
 
@@ -281,11 +284,38 @@ var molotok = require('molotok');
 
 Возвращает: `{number}`
 
+### Модуль `array`
+
+#### Метод `array.pushOnce`
+
+Добавляет элементы в массив без повтора.
+
+Дополненный аналог стандартного метода `Array.prototype.push`.
+
+Параметры:
+* `{array}` `array` — массив
+* `{...*}` `element` — элементы для добавления
+
+Возвращает: `{number}` — количество элементов в массиве
+
+#### Метод `array.concatOnce`
+
+Добавляет отдельные элементы и элементы других массивов в массив без повтора,
+не модифицируя исходный массив.
+
+Дополненный аналог стандартного метода `Array.prototype.concat`.
+
+Параметры:
+* `{array}` `array` — массив
+* `{...*}` `element` — элементы для добавления
+
+Возвращает: `{array}` — новый массив
+
 ### Модуль `object`
 
 #### Метод `object.isNeedHasOwnProperty`
 
-Проверить необходимость использования `hasOwnProperty` при переборе
+Проверяет необходимость использования `hasOwnProperty` при переборе
 свойств объекта циклом `for...in`.
 
 Метод `hasOwnProperty` достаточно затратен и его можно
@@ -298,7 +328,7 @@ var molotok = require('molotok');
 
 #### Метод `object.hasOwnProperty`
 
-Проверить принадлежность свойства объекту с помощью нативного `hasOwnProperty`.
+Проверяет принадлежность свойства объекту с помощью нативного `hasOwnProperty`.
 
 Этот метод можно уверенно применять для любого объекта,
 даже если у него задано поле `hasOwnProperty`.
@@ -311,7 +341,7 @@ var molotok = require('molotok');
 
 #### Метод `object.isEmpty`
 
-Проверить объект на наличие полей.
+Проверяет объект на наличие полей.
 
 Параметры:
 * `{object}` `obj` — объект для проверки
@@ -362,7 +392,7 @@ var molotok = require('molotok');
 
 #### Метод `object.each`
 
-Проитерироваться по ключам объекта.
+Перебирает значения объекта.
 
 Параметры:
 
@@ -383,7 +413,7 @@ var molotok = require('molotok');
 
 #### Метод `object.deepEach`
 
-Проитерироваться по ключам объекта рекурсивно.
+Перебирает значения объекта рекурсивно.
 
 Параметры:
 
@@ -404,7 +434,7 @@ var molotok = require('molotok');
 
 #### Метод `object.map`
 
-Модифицировать значения каждого ключа заданного объекта.
+Модифицирует значения каждого ключа заданного объекта.
 
 Параметры:
 
@@ -424,7 +454,7 @@ var molotok = require('molotok');
 
 #### Метод `object.deepMap`
 
-Модифицировать значения каждого ключа заданного объекта рекурсивно.
+Модифицирует значения каждого ключа заданного объекта рекурсивно.
 
 Параметры:
 
