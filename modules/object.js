@@ -121,6 +121,7 @@ definer('object', /** @exports object */ function(is) {
      * @callback object~eachCallback
      * @param {string} key Ключ
      * @param {*} val Значение
+     * @param {object} Перебираемый объект
      * @returns {undefined|*} При возвращении любого значения, кроме `undefined`,
      * перебор останавливается и метод `each` возвращает это значение
      */
@@ -139,12 +140,12 @@ definer('object', /** @exports object */ function(is) {
 
         if(this.isNeedHasOwnProperty(obj)) {
             for(key in obj) if(this.hasOwnProperty(obj, key)) {
-                result = callback.call(context || obj, key, obj[key]);
+                result = callback.call(context || obj, key, obj[key], obj);
                 if(result !== undefined) return result;
             }
         } else {
             for(key in obj) {
-                result = callback.call(context || obj, key, obj[key]);
+                result = callback.call(context || obj, key, obj[key], obj);
                 if(result !== undefined) return result;
             }
         }
@@ -173,7 +174,7 @@ definer('object', /** @exports object */ function(is) {
                 if(deepResult !== undefined) return deepResult;
                 continue;
             }
-            result = callback.call(context || obj, key, val);
+            result = callback.call(context || obj, key, val, obj);
             if(result !== undefined) return result;
         }
     };

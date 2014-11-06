@@ -186,9 +186,11 @@ definer('objectTest', function(assert, object) {
         });
 
         it('Проитерироваться по объекту', function() {
-            var items = [];
-            object.each({ a: 'first', b: 100, c: true, d: null }, function(key, val) {
+            var items = [],
+                iterateObj = { a: 'first', b: 100, c: true, d: null };
+            object.each(iterateObj, function(key, val, obj) {
                 items.push({ key: key, val: val });
+                assert.deepEqual(obj, iterateObj);
             });
             assert.deepEqual(items, [
                 { key: 'a', val: 'first' },
@@ -235,19 +237,43 @@ definer('objectTest', function(assert, object) {
             assert.isFalse(object.each({ a: 1, b: 2, c: 3, d: 4 }, function(key, val) {
                 if(val === 3) return false;
                 vals.push(val);
-            }, context));
+            }));
             assert.deepEqual(vals, [1, 2]);
         });
 
         it('Рекурсивно проитерироваться по объекту', function() {
-            var items = [];
-            object.deepEach({
-                a: 'first',
-                b: { b1: 100, b2: { b21: 200 }},
-                c: { c1: { c11: true, c12: false }, c2: 'second' },
-                d: null
-            }, function(key, val) {
+            var items = [],
+                iterateObj = {
+                    a: 'first',
+                    b: { b1: 100, b2: { b21: 200 }},
+                    c: { c1: { c11: true, c12: false }, c2: 'second' },
+                    d: null
+                };
+            object.deepEach(iterateObj, function(key, val, obj) {
                 items.push({ key: key, val: val });
+                switch(key) {
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                        assert.deepEqual(obj, iterateObj);
+                        break;
+                    case 'b1':
+                    case 'b2':
+                        assert.deepEqual(obj, { b1: 100, b2: { b21: 200 }});
+                        break;
+                    case 'b21':
+                        assert.deepEqual(obj, { b21: 200 });
+                        break;
+                    case 'c1':
+                    case 'c2':
+                        assert.deepEqual(obj, { c1: { c11: true, c12: false }, c2: 'second' });
+                        break;
+                    case 'c11':
+                    case 'c12':
+                        assert.deepEqual(obj, { c11: true, c12: false });
+                        break;
+                }
             });
             assert.deepEqual(items, [
                 { key: 'a', val: 'first' },
