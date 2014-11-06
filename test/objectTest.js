@@ -350,5 +350,75 @@ definer('objectTest', function(assert, object) {
             assert.deepEqual(vals, [100, 'first', 200, false, 20]);
         });
 
+        it('Метод map', function() {
+            var o = { a: 1, b: 2, c: 3 },
+                result = { a: undefined, b: 4, c: 6 },
+                context = {};
+            assert.deepEqual(object.map(o, function(key, val, obj) {
+                assert.deepEqual(this, context);
+                assert.deepEqual(obj, o);
+                if(key !== 'a') return val * 2;
+            }, context), result);
+            assert.deepEqual(o, result);
+        });
+
+        it('Метод deepMap', function() {
+            var o = {
+                    a: 10,
+                    c: {
+                        c1: 20,
+                        c3: {
+                            c31: 30
+                        },
+                        c4: 40
+                    },
+                    d: 50
+                },
+                result = {
+                    a: 15,
+                    c: {
+                        c1: 25,
+                        c3: {
+                            c31: 35
+                        },
+                        c4: 45
+                    },
+                    d: 55
+                },
+                context = {};
+            assert.deepEqual(object.deepMap(o, function(key, val, obj) {
+                assert.deepEqual(this, context);
+                switch(key) {
+                    case 'a':
+                    case 'd':
+                        assert.deepEqual(obj, o);
+                        break;
+                    case 'c1':
+                        assert.deepEqual(obj, {
+                            c1: 20,
+                            c3: {
+                                c31: 30
+                            },
+                            c4: 40
+                        });
+                        break;
+                    case 'c4':
+                        assert.deepEqual(obj, {
+                            c1: 25,
+                            c3: {
+                                c31: 35
+                            },
+                            c4: 40
+                        });
+                        break;
+                    case 'c31':
+                        assert.deepEqual(obj, { c31: 30 });
+                        break;
+                }
+                return val + 5;
+            }, context), result);
+            assert.deepEqual(o, result);
+        });
+
     });
 });

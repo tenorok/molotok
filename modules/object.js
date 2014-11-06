@@ -179,6 +179,47 @@ definer('object', /** @exports object */ function(is) {
         }
     };
 
+    /**
+     * Колбек вызывается для каждого ключа объекта
+     * при переборе методами `map` и `deepMap`.
+     *
+     * @callback object~mapCallback
+     * @param {string} key Ключ
+     * @param {*} val Значение
+     * @param {object} obj Перебираемый объект
+     * @returns {*} Значение поля
+     */
+
+    /**
+     * Модифицировать значения каждого ключа заданного объекта.
+     *
+     * @param {object} obj Объект
+     * @param {object~mapCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {object} Модифицированный объект
+     */
+    object.map = function(obj, callback, context) {
+        this.each(obj, function(key) {
+            obj[key] = callback.apply(this, arguments);
+        }, context);
+        return obj;
+    };
+
+    /**
+     * Модифицировать значения каждого ключа заданного объекта рекурсивно.
+     *
+     * @param {object} obj Объект
+     * @param {object~mapCallback} callback Колбек
+     * @param {object} [context=obj] Контекст вызова колбека (По умолчанию: итерируемый объект)
+     * @returns {object} Модифицированный объект
+     */
+    object.deepMap = function(obj, callback, context) {
+        this.deepEach(obj, function(key, val, curObj) {
+            curObj[key] = callback.apply(this, arguments);
+        }, context);
+        return obj;
+    };
+
     return object;
 
 });
