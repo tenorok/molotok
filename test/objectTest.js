@@ -139,6 +139,57 @@ definer('objectTest', function(assert, object) {
             assert.isTrue(object.isEmpty(undefined));
         });
 
+        it('Проверить объекты на идентичность', function() {
+            assert.isTrue(object.isEqual({ a: 1 }, { a: 1 }));
+            assert.isFalse(object.isEqual({ a: 1 }, { a: 2 }));
+            assert.isFalse(object.isEqual({ a: 1 }, { b: 2, c: 3 }));
+            assert.isFalse(object.isEqual({ a: 'a', b: true }, { a: 'a', b: true, c: false }));
+            assert.isFalse(object.isEqual({ a: 'a', b: true, c: false }, { a: 'a', b: true }));
+        });
+
+        it('Проверить объекты на идентичность рекурсивно', function() {
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }}
+            ));
+
+            assert.isFalse(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 5 }, f: 4 }}
+            ));
+
+            assert.isFalse(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 6 }, f: 4 }}
+            ), 'несколько объектов для сравнения');
+
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [], g: 5 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [], g: 5 }}
+            ), 'с вложенными массивами');
+
+            assert.isFalse(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [1], g: 5 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [2], g: 5 }}
+            ), 'с вложенными разными массивами');
+
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }},
+                { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }}
+            ), 'с массивами, внутри которых объекты');
+        });
+
+        it('Получить количество собственных полей объекта', function() {
+            assert.equal(object.size({ a: 1, b: 2, c: 3 }), 3);
+            function Foo() {
+                this.a = 1;
+                this.c = 3;
+            }
+            Foo.prototype.b = 2;
+            assert.equal(object.size(new Foo), 2);
+        });
+
         it('Клонировать объект', function() {
             var a = {},
                 b = object.clone(a);

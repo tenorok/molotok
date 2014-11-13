@@ -61,7 +61,10 @@ var molotok = require('molotok');
 - [Модуль `object`](#Модуль-object)
   - [Метод `object.isNeedHasOwnProperty`](#Метод-objectisneedhasownproperty)
   - [Метод `object.hasOwnProperty`](#Метод-objecthasownproperty)
+  - [Метод `object.size`](#Метод-objectsize)
   - [Метод `object.isEmpty`](#Метод-objectisempty)
+  - [Метод `object.isEqual`](#Метод-objectisequal)
+  - [Метод `object.isDeepEqual`](#Метод-objectisdeepequal)
   - [Метод `object.extend`](#Метод-objectextend)
   - [Метод `object.deepExtend`](#Метод-objectdeepextend)
   - [Метод `object.clone`](#Метод-objectclone)
@@ -339,12 +342,41 @@ var molotok = require('molotok');
 
 Возвращает: `{boolean}`
 
+#### Метод `object.size`
+
+Возвращает количество собственных полей объекта.
+
+Параметры:
+* `{object}` `obj` — объект для подсчёта
+
+Возвращает: `{number}`
+
 #### Метод `object.isEmpty`
 
 Проверяет объект на наличие полей.
 
 Параметры:
 * `{object}` `obj` — объект для проверки
+
+Возвращает: `{boolean}`
+
+#### Метод `object.isEqual`
+
+Проверяет объекты на идентичность.
+
+Параметры:
+
+* `{...object}` `obj` — объекты для проверки
+
+Возвращает: `{boolean}`
+
+#### Метод `object.isDeepEqual`
+
+Проверяет объекты на идентичность рекурсивно.
+
+Параметры:
+
+* `{...object}` `obj` — объекты для проверки
 
 Возвращает: `{boolean}`
 
