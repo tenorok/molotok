@@ -139,6 +139,14 @@ definer('objectTest', function(assert, object) {
             assert.isTrue(object.isEmpty(undefined));
         });
 
+        it('Проверить объекты на идентичность', function() {
+            assert.isTrue(object.isEqual({ a: 1 }, { a: 1 }));
+            assert.isFalse(object.isEqual({ a: 1 }, { a: 2 }));
+            assert.isFalse(object.isEqual({ a: 1 }, { b: 2, c: 3 }));
+            assert.isFalse(object.isEqual({ a: 'a', b: true }, { a: 'a', b: true, c: false }));
+            assert.isFalse(object.isEqual({ a: 'a', b: true, c: false }, { a: 'a', b: true }));
+        });
+
         it('Получить количество собственных полей объекта', function() {
             assert.equal(object.size({ a: 1, b: 2, c: 3 }), 3);
             function Foo() {

@@ -55,6 +55,22 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
+        ops.isEqual = 900000;
+        it('Проверить объекты на идентичность / ' + format(ops.isEqual), function(done) {
+            new Benchmark.Suite()
+                .add('isEqual', function() {
+                    object.isEqual({ a: 'a', b: true, c: false }, { a: 'a', b: true });
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+                    result.target.hz < ops.isEqual
+                        ? done(new Error('Slower than ' + format(ops.isEqual)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
         ops.size = 4000000;
         it('Получить количество собственных полей объекта / ' + format(ops.size), function(done) {
             var obj = {

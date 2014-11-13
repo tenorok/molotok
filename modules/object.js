@@ -83,6 +83,25 @@ definer('object', /** @exports object */ function(is) {
     };
 
     /**
+     * Проверить объекты на идентичность.
+     *
+     * @param {...object} obj Объекты для проверки
+     * @returns {boolean}
+     */
+    object.isEqual = function(obj) {
+        var compareObjects = [].slice.call(arguments, 1),
+            objLen = this.size(obj);
+
+        for(var i = 0; i < compareObjects.length; i++) {
+            if(objLen !== this.size(compareObjects[i])) return false;
+            if(this.each(obj, function(key, val) {
+                if(val !== compareObjects[i][key]) return true;
+            })) return false;
+        }
+        return true;
+    };
+
+    /**
      * Получить количество собственных полей объекта.
      *
      * @param {object} obj Объект
