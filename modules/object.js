@@ -102,6 +102,32 @@ definer('object', /** @exports object */ function(is) {
     };
 
     /**
+     * Проверить объекты на идентичность рекурсивно.
+     *
+     * @param {...object} obj Объекты для проверки
+     * @returns {boolean}
+     */
+    object.isDeepEqual = function(obj) {
+        var compareObjects = [].slice.call(arguments, 1);
+
+        for(var i = 0; i < compareObjects.length; i++) {
+            var compareObj = compareObjects[i];
+            if(is.map(obj, compareObj)) {
+                if(this.size(obj) !== this.size(compareObj)) return false;
+                if(this.each(obj, function(key, val) {
+                    if(!this.isDeepEqual(val, compareObj[key])) return true;
+                }, this)) return false;
+            } else if(is.array(obj, compareObj)) {
+                if(obj.length !== compareObj.length) return false;
+                for(var j = 0; j < obj.length; j++) {
+                    if(!this.isDeepEqual(obj[j], compareObj[j])) return false;
+                }
+            } else if(obj !== compareObj) return false;
+        }
+        return true;
+    };
+
+    /**
      * Получить количество собственных полей объекта.
      *
      * @param {object} obj Объект

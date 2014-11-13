@@ -147,6 +147,39 @@ definer('objectTest', function(assert, object) {
             assert.isFalse(object.isEqual({ a: 'a', b: true, c: false }, { a: 'a', b: true }));
         });
 
+        it('Проверить объекты на идентичность рекурсивно', function() {
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }}
+            ));
+
+            assert.isFalse(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 5 }, f: 4 }}
+            ));
+
+            assert.isFalse(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: 4 }},
+                { a: 1, b: { c: 2, d: { e: 6 }, f: 4 }}
+            ), 'несколько объектов для сравнения');
+
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [], g: 5 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [], g: 5 }}
+            ), 'с вложенными массивами');
+
+            assert.isFalse(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [1], g: 5 }},
+                { a: 1, b: { c: 2, d: { e: 3 }, f: [2], g: 5 }}
+            ), 'с вложенными разными массивами');
+
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }},
+                { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }}
+            ), 'с массивами, внутри которых объекты');
+        });
+
         it('Получить количество собственных полей объекта', function() {
             assert.equal(object.size({ a: 1, b: 2, c: 3 }), 3);
             function Foo() {

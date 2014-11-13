@@ -71,6 +71,25 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
+        ops.isDeepEqual = 40000;
+        it('Проверить объекты на идентичность рекурсивно / ' + format(ops.isDeepEqual), function(done) {
+            new Benchmark.Suite()
+                .add('isDeepEqual', function() {
+                    object.isDeepEqual(
+                        { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }},
+                        { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'bar'] }, f: [{}], g: 5 }}
+                    );
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+                    result.target.hz < ops.isDeepEqual
+                        ? done(new Error('Slower than ' + format(ops.isDeepEqual)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
         ops.size = 4000000;
         it('Получить количество собственных полей объекта / ' + format(ops.size), function(done) {
             var obj = {
