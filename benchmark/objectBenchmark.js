@@ -4,7 +4,7 @@ definer('objectBenchmark', function(format, object) {
 
     describe('Тестирование производительности модуля object.', function() {
         var ops = {};
-        this.timeout(15000);
+        this.timeout(30000);
 
         ops.extend = 1250000;
         it('Расширение объекта / ' + format(ops.extend), function(done) {
@@ -15,7 +15,6 @@ definer('objectBenchmark', function(format, object) {
                 .on('cycle', function(event) { benchmarks.add(event.target); })
                 .on('complete', function(result) {
                     benchmarks.log();
-
                     result.target.hz < ops.extend
                         ? done(new Error('Slower than ' + format(ops.extend)))
                         : done();
@@ -32,7 +31,6 @@ definer('objectBenchmark', function(format, object) {
                 .on('cycle', function(event) { benchmarks.add(event.target); })
                 .on('complete', function(result) {
                     benchmarks.log();
-
                     result.target.hz < ops.deepExtend
                         ? done(new Error('Slower than ' + format(ops.deepExtend)))
                         : done();
@@ -50,7 +48,6 @@ definer('objectBenchmark', function(format, object) {
                 .on('cycle', function(event) { benchmarks.add(event.target); })
                 .on('complete', function(result) {
                     benchmarks.log();
-
                     result.target.hz < ops.isEmpty
                         ? done(new Error('Slower than ' + format(ops.isEmpty)))
                         : done();
@@ -58,7 +55,30 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
-        ops.each = 3700000;
+        ops.size = 4000000;
+        it('Получить количество собственных полей объекта / ' + format(ops.size), function(done) {
+            var obj = {
+                a: 1, b: 2, c: 3,
+                d: 4, e: 5, f: 6
+            };
+            new Benchmark.Suite()
+                .add('Object.keys', function() {
+                    Object.keys(obj).length;
+                })
+                .add('size', function() {
+                    object.size(obj);
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+                    result.target.hz < ops.size
+                        ? done(new Error('Slower than ' + format(ops.size)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
+        ops.each = 3500000;
         it('Проитерироваться по ключам объекта / ' + format(ops.each), function(done) {
             new Benchmark.Suite()
                 .add('each', function() {
@@ -67,7 +87,6 @@ definer('objectBenchmark', function(format, object) {
                 .on('cycle', function(event) { benchmarks.add(event.target); })
                 .on('complete', function(result) {
                     benchmarks.log();
-
                     result.target.hz < ops.each
                         ? done(new Error('Slower than ' + format(ops.each)))
                         : done();
@@ -98,7 +117,6 @@ definer('objectBenchmark', function(format, object) {
                 .on('cycle', function(event) { benchmarks.add(event.target); })
                 .on('complete', function(result) {
                     benchmarks.log();
-
                     result.target.hz < ops.deepEach
                         ? done(new Error('Slower than ' + format(ops.deepEach)))
                         : done();

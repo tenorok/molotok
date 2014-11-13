@@ -83,6 +83,20 @@ definer('object', /** @exports object */ function(is) {
     };
 
     /**
+     * Получить количество собственных полей объекта.
+     *
+     * @param {object} obj Объект
+     * @returns {number}
+     */
+    object.size = function(obj) {
+        var size = 0;
+        object.each(obj, function() {
+            size++;
+        });
+        return size;
+    };
+
+    /**
      * Клонировать объект.
      *
      * @param {object} obj Объект

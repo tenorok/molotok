@@ -139,6 +139,16 @@ definer('objectTest', function(assert, object) {
             assert.isTrue(object.isEmpty(undefined));
         });
 
+        it('Получить количество собственных полей объекта', function() {
+            assert.equal(object.size({ a: 1, b: 2, c: 3 }), 3);
+            function Foo() {
+                this.a = 1;
+                this.c = 3;
+            }
+            Foo.prototype.b = 2;
+            assert.equal(object.size(new Foo), 2);
+        });
+
         it('Клонировать объект', function() {
             var a = {},
                 b = object.clone(a);
