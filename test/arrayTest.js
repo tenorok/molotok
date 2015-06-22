@@ -62,5 +62,38 @@ definer('arrayTest', function(assert, array) {
 
         });
 
+        describe('Метод deepClone.', function() {
+
+            it('Рекурсивно клонировать массив с вложенными массивами', function() {
+                var a = [1, [2, [3]], [4]],
+                    b = array.deepClone(a);
+                b.push(2);
+                assert.equal(a.length, 3);
+                b[1].push(3);
+                assert.equal(a[1].length, 2);
+                b[1][1].push(4);
+                assert.equal(a[1][1].length, 1);
+            });
+
+            it('Рекурсивно клонировать массив с вложенными объектами', function() {
+                var a = [
+                        1,
+                        {
+                            a: 2,
+                            b: { c: 3 }
+                        },
+                        [3]
+                    ],
+                    b = array.deepClone(a);
+                b.push(2);
+                assert.equal(a.length, 3);
+                b[1].d = 4;
+                assert.isUndefined(a[1].d);
+                b[1].b.c = 5;
+                assert.equal(a[1].b.c, 3);
+            });
+
+        });
+
     });
 });
