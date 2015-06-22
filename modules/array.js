@@ -1,4 +1,4 @@
-definer('array', /** @exports array */ function(is) {
+definer('array', /** @exports array */ function(is, object) {
 
     /**
      * Модуль работы с массивами.
@@ -48,6 +48,38 @@ definer('array', /** @exports array */ function(is) {
         }
 
         return newArr;
+    };
+
+    /**
+     * Клонировать массив.
+     *
+     * @param {array} arr Массив
+     * @returns {array} Новый массив
+     */
+    array.clone = function(arr) {
+        return arr.slice();
+    };
+
+    /**
+     * Клонировать массив рекурсивно.
+     *
+     * @param {array} arr Массив
+     * @returns {array} Новый массив
+     */
+    array.deepClone = function(arr) {
+        var clone = [];
+        for(var i = 0, len = arr.length; i < len; i++) {
+            var elem = arr[i];
+
+            if(is.array(elem)) {
+                elem = array.deepClone(elem);
+            } else if(is.map(elem)) {
+                elem = object.deepClone(elem);
+            }
+
+            clone.push(elem);
+        }
+        return clone;
     };
 
     return array;

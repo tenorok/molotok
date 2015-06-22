@@ -58,6 +58,8 @@ var molotok = require('molotok');
 - [Модуль `array`](#Модуль-array)
   - [Метод `array.pushOnce`](#Метод-arraypushonce)
   - [Метод `array.concatOnce`](#Метод-arrayconcatonce)
+  - [Метод `array.clone`](#Метод-arrayclone)
+  - [Метод `array.deepClone`](#Метод-arraydeepclone)
 - [Модуль `object`](#Модуль-object)
   - [Метод `object.isNeedHasOwnProperty`](#Метод-objectisneedhasownproperty)
   - [Метод `object.hasOwnProperty`](#Метод-objecthasownproperty)
@@ -313,6 +315,26 @@ var molotok = require('molotok');
 * `{...*}` `element` — элементы для добавления
 
 Возвращает: `{array}` — новый массив
+
+#### Метод `array.clone`
+
+Клонирует массив.
+
+Параметры:
+
+* `{array}` `array` — клонируемый массив
+
+Возвращает: `{array}`
+
+#### Метод `array.deepClone`
+
+Клонирует массив рекурсивно.
+
+Параметры:
+
+* `{array}` `array` — клонируемый массив
+
+Возвращает: `{array}`
 
 ### Модуль `object`
 
