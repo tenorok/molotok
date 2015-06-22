@@ -50,6 +50,16 @@ definer('array', /** @exports array */ function(is) {
         return newArr;
     };
 
+    /**
+     * Клонировать массив.
+     *
+     * @param {array} arr Массив
+     * @returns {array} Новый массив
+     */
+    array.clone = function(arr) {
+        return arr.slice();
+    };
+
     return array;
 
 });

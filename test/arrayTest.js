@@ -51,5 +51,16 @@ definer('arrayTest', function(assert, array) {
 
         });
 
+        describe('Метод clone.', function() {
+
+            it('Клонировать массив', function() {
+                var a = [],
+                    b = array.clone(a);
+                b.push(1);
+                assert.equal(a.length, 0);
+            });
+
+        });
+
     });
 });
