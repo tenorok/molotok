@@ -90,6 +90,27 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
+        ops.isDeepEqualWithLink = 20000;
+        it('Проверить объекты с ссылкой на идентичность рекурсивно / ' + format(ops.isDeepEqualWithLink),
+            function(done) {
+            var d = { e: [1, { x: 0 }, 'foo'] };
+            new Benchmark.Suite()
+                .add('isDeepEqualWithLink', function() {
+                    object.isDeepEqual(
+                        { a: 1, b: { c: 2, d: d, f: [{}], g: 5 }},
+                        { a: 1, b: { c: 2, d: d, f: [{}], g: 5 }}
+                    );
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+                    result.target.hz < ops.isDeepEqualWithLink
+                        ? done(new Error('Slower than ' + format(ops.isDeepEqualWithLink)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
         ops.size = 4000000;
         it('Получить количество собственных полей объекта / ' + format(ops.size), function(done) {
             var obj = {

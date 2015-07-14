@@ -178,6 +178,12 @@ definer('objectTest', function(assert, object) {
                 { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }},
                 { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }}
             ), 'с массивами, внутри которых объекты');
+
+            var d = { e: 3 };
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: d, f: 4 }},
+                { a: 1, b: { c: 2, d: d, f: 4 }}
+            ), 'с ссылкой на один объект');
         });
 
         it('Получить количество собственных полей объекта', function() {

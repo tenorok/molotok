@@ -112,6 +112,7 @@ definer('object', /** @exports object */ function(is) {
 
         for(var i = 0; i < compareObjects.length; i++) {
             var compareObj = compareObjects[i];
+            if(obj === compareObj) return true;
             if(is.map(obj, compareObj)) {
                 if(this.size(obj) !== this.size(compareObj)) return false;
                 if(this.each(obj, function(key, val) {
