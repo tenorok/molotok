@@ -6,7 +6,7 @@ definer('objectBenchmark', function(format, object) {
         var ops = {};
         this.timeout(30000);
 
-        ops.extend = 1250000;
+        ops.extend = 8000000;
         it('Расширение объекта / ' + format(ops.extend), function(done) {
             new Benchmark.Suite()
                 .add('extend', function() {
@@ -22,7 +22,7 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
-        ops.deepExtend = 54000;
+        ops.deepExtend = 50000;
         it('Рекурсивное расширение объекта / ' + format(ops.deepExtend), function(done) {
             new Benchmark.Suite()
                 .add('deepExtend', function() {
@@ -55,7 +55,7 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
-        ops.isEqual = 900000;
+        ops.isEqual = 350000;
         it('Проверить объекты на идентичность / ' + format(ops.isEqual), function(done) {
             new Benchmark.Suite()
                 .add('isEqual', function() {
@@ -71,7 +71,24 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
-        ops.isDeepEqual = 40000;
+        ops.isEqualWithLink = 350000;
+        it('Проверить объекты-ссылки на идентичность / ' + format(ops.isEqualWithLink), function(done) {
+            var obj = { a: 1, b: 2 };
+            new Benchmark.Suite()
+                .add('isEqualWithLink', function() {
+                    object.isEqual(obj, obj);
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+                    result.target.hz < ops.isEqualWithLink
+                        ? done(new Error('Slower than ' + format(ops.isEqualWithLink)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
+        ops.isDeepEqual = 15000;
         it('Проверить объекты на идентичность рекурсивно / ' + format(ops.isDeepEqual), function(done) {
             new Benchmark.Suite()
                 .add('isDeepEqual', function() {
@@ -85,6 +102,27 @@ definer('objectBenchmark', function(format, object) {
                     benchmarks.log();
                     result.target.hz < ops.isDeepEqual
                         ? done(new Error('Slower than ' + format(ops.isDeepEqual)))
+                        : done();
+                })
+                .run({ async: true });
+        });
+
+        ops.isDeepEqualWithLink = 20000;
+        it('Проверить объекты с ссылкой на идентичность рекурсивно / ' + format(ops.isDeepEqualWithLink),
+            function(done) {
+            var d = { e: [1, { x: 0 }, 'foo'] };
+            new Benchmark.Suite()
+                .add('isDeepEqualWithLink', function() {
+                    object.isDeepEqual(
+                        { a: 1, b: { c: 2, d: d, f: [{}], g: 5 }},
+                        { a: 1, b: { c: 2, d: d, f: [{}], g: 5 }}
+                    );
+                })
+                .on('cycle', function(event) { benchmarks.add(event.target); })
+                .on('complete', function(result) {
+                    benchmarks.log();
+                    result.target.hz < ops.isDeepEqualWithLink
+                        ? done(new Error('Slower than ' + format(ops.isDeepEqualWithLink)))
                         : done();
                 })
                 .run({ async: true });
@@ -129,7 +167,7 @@ definer('objectBenchmark', function(format, object) {
                 .run({ async: true });
         });
 
-        ops.deepEach = 90000;
+        ops.deepEach = 70000;
         it('Рекурсивно проитерироваться по ключам объекта / ' + format(ops.deepEach), function(done) {
             new Benchmark.Suite()
                 .add('deepEach', function() {
