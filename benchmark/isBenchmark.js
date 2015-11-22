@@ -6,7 +6,7 @@ definer('isBenchmark', function(format, is) {
         var ops = {};
         this.timeout(15000);
 
-        ops.map = 190000;
+        ops.map = 130000;
         it('Проверка на карту / ' + format(ops.map), function(done) {
             new Benchmark.Suite()
                 .add('map', function() {
@@ -23,7 +23,7 @@ definer('isBenchmark', function(format, is) {
                 .run({ async: true });
         });
 
-        ops.array = 4200000;
+        ops.array = 3500000;
         it('Проверка на массив / ' + format(ops.array), function(done) {
             new Benchmark.Suite()
                 .add('array', function() {
@@ -74,7 +74,7 @@ definer('isBenchmark', function(format, is) {
                 .run({ async: true });
         });
 
-        ops.type = 200000;
+        ops.type = 160000;
         it('Получение типа данных / ' + format(ops.type), function(done) {
             new Benchmark.Suite()
                 .add('type', function() {

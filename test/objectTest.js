@@ -145,6 +145,10 @@ definer('objectTest', function(assert, object) {
             assert.isFalse(object.isEqual({ a: 1 }, { b: 2, c: 3 }));
             assert.isFalse(object.isEqual({ a: 'a', b: true }, { a: 'a', b: true, c: false }));
             assert.isFalse(object.isEqual({ a: 'a', b: true, c: false }, { a: 'a', b: true }));
+
+            var obj = { a: 1 };
+            assert.isTrue(object.isEqual(obj, obj));
+            assert.isFalse(object.isEqual(obj, obj, {}));
         });
 
         it('Проверить объекты на идентичность рекурсивно', function() {
@@ -178,6 +182,14 @@ definer('objectTest', function(assert, object) {
                 { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }},
                 { a: 1, b: { c: 2, d: { e: [1, { x: 0 }, 'foo'] }, f: [{}], g: 5 }}
             ), 'с массивами, внутри которых объекты');
+
+            var d = { e: 3 };
+            assert.isTrue(object.isDeepEqual(
+                { a: 1, b: { c: 2, d: d, f: 4 }},
+                { a: 1, b: { c: 2, d: d, f: 4 }}
+            ), 'с ссылкой на один объект');
+
+            assert.isFalse(object.isDeepEqual(d, d, {}), 'с ссылкой на один объект и третьим объектом');
         });
 
         it('Получить количество собственных полей объекта', function() {
